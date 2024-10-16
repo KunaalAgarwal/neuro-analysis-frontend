@@ -2,16 +2,19 @@
   "name": "neuro-analysis-frontend",
   "version": "1.0.0",
   "description": "Front end for the CWL neuro analysis workflow app.",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build"
   },
   "keywords": [],
   "author": "Kunaal Agarwal and Javier Rasero",
   "license": "MIT",
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.2",
     "vite": "^5.4.9"
   }
 }
