@@ -2,7 +2,8 @@
 
 .workflow-menu-container {
   width: 250px;
-  overflow-y: auto; 
+  max-height: calc(7 * 60px); /* Fixed height to fit 5 items */
+  overflow-y: auto; /* Enable scrolling if content exceeds the height */
   margin: 20px 0;
   margin-left: 20px;
   padding: 0;
@@ -13,6 +14,7 @@
   backdrop-filter: blur(8px);
 }
 
+/* Menu layout and spacing */
 .workflow-menu {
   display: flex;
   flex-direction: column;
@@ -20,6 +22,7 @@
   padding: 15px;
 }
 
+/* Scrollbar styling */
 .workflow-menu::-webkit-scrollbar {
   width: 8px;
 }
