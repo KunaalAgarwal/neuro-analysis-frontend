@@ -2,8 +2,8 @@
 
 .workflow-menu-container {
   width: 250px;
-  max-height: calc(7 * 60px); /* Fixed height to fit 5 items */
-  overflow-y: auto; /* Enable scrolling if content exceeds the height */
+  max-height: calc(7 * 60px);
+  overflow-y: auto;
   margin: 20px 0;
   margin-left: 20px;
   padding: 0;
@@ -22,16 +22,26 @@
   padding: 15px;
 }
 
-/* Scrollbar styling */
-.workflow-menu::-webkit-scrollbar {
-  width: 8px;
+/*Scroll bar */
+.workflow-menu-container::-webkit-scrollbar {
+  width: 10px;
 }
 
-.workflow-menu::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
+.workflow-menu-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); 
   border-radius: 8px;
 }
 
-.workflow-menu::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
+.workflow-menu-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  border: 2px solid rgba(46, 46, 46, 0.9);
+}
+
+.workflow-menu-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5); 
+}
+
+.workflow-menu-container {
+  scroll-behavior: smooth;
 }
