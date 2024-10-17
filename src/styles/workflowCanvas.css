@@ -11,7 +11,7 @@
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
+  display: block;
   flex-direction: column; /* Adjust to stack WorkflowItems vertically */
   align-items: center;
   justify-content: flex-start; /* Align WorkflowItems at the top */
@@ -19,10 +19,10 @@
   color: white;
   font-family: 'Inter', sans-serif;
   transition: background-color 0.2s ease;
+  pointer-events: all;
 }
 
-/* Hover effect: Highlight background when an item is dragged over */
 .workflow-canvas.is-over {
-  background-color: #e0e0e0; /* Light grey on hover */
-  color: black; /* Change text color to black for contrast */
+  background-color: #e0e0e0; 
+  color: black;
 }
