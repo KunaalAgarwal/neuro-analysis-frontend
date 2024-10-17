@@ -1,0 +1,39 @@
+/* src/styles/toggleWorkflowBar.css */
+
+/* Container for the Toggle Workflow Bar */
+.toggle-workflow-bar {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%; /* Width of the bar */
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(46, 46, 46, 0.9); /* Transparent background */
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Depth effect */
+    backdrop-filter: blur(6px); /* Glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000; /* Stay on top */
+  }
+  
+  /* Styling for the page numbers */
+  .page-numbers {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .page-numbers span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .page-numbers span:hover {
+    transform: scale(1.1);
+  }
+  

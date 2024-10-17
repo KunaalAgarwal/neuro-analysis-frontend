@@ -1,0 +1,16 @@
+.workflow-canvas {
+    flex-grow: 1;
+    margin: 20px;
+    margin-bottom: 140px; 
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+  }

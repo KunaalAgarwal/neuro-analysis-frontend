@@ -1,0 +1,21 @@
+.workflow-menu {
+    width: 250px;
+    margin: 20px 0; 
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    background-color: rgba(46, 46, 46, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .workflow-menu-container {
+    margin-left: 80px; 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  

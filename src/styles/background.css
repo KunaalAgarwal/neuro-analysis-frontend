@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600&family=Roboto+Mono:wght@400;500&display=swap');
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1a1a1a;
+  font-family: 'Roboto Mono', monospace;
+  color: white;
+}
+
+h1, h2, h3 {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 600;
+  margin: 0;
+  padding: 10px 0;
+}
+
+  .app-layout {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .floating {
+    position: absolute;
+    z-index: 10;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    background-color: #2e2e2e; 
+  }
+  
+  button {
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 500;
+    border-radius: 8px;
+    background-color: #3b3b3b;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+  }
+  
+  button:hover {
+    background-color: #4c4c4c;
+  }
+
+  .app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
