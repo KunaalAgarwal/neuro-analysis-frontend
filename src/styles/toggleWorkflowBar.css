@@ -1,10 +1,10 @@
 .toggle-workflow-bar {
     position: fixed;
-    bottom: 10px;
+    bottom: clamp(5px, 2vh, 10px);
     left: 50%;
     transform: translateX(-50%);
-    width: 60%; 
-    padding: 10px;
+    width: clamp(300px, 60%, 800px);
+    padding: clamp(8px, 1vw, 12px);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,7 +18,7 @@
   
   .page-numbers {
     display: flex;
-    gap: 8px;
+    gap: clamp(6px, 1vw, 12px);
   }
   
   .page-numbers span {
@@ -33,5 +33,5 @@
   
   .page-numbers span:hover {
     transform: scale(1.1);
+    color: #b0b0b0;
   }
-  

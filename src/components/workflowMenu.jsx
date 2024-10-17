@@ -11,7 +11,9 @@ function WorkflowMenu() {
     'Filtering',
     'Transformation',
     'Preprocessing',
-  ]; // Add more items for testing scroll behavior
+    'Normalization',
+    'Feature Extraction',
+  ];
 
   return (
     <div className="workflow-menu-container">
