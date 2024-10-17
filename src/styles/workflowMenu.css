@@ -1,21 +1,34 @@
+/* src/styles/workflowMenu.css */
+
+.workflow-menu-container {
+  width: 250px;
+  overflow-y: auto; 
+  margin: 20px 0;
+  margin-left: 20px;
+  padding: 0;
+  border-radius: 12px;
+  background-color: rgba(46, 46, 46, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+}
+
 .workflow-menu {
-    width: 250px;
-    margin: 20px 0; 
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px; 
-    background-color: rgba(46, 46, 46, 0.9);
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .workflow-menu-container {
-    margin-left: 80px; 
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+}
+
+.workflow-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.workflow-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+}
+
+.workflow-menu::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}

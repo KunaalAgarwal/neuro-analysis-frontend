@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import WorkflowItem from './workflowItem';
 import '../styles/workflowCanvas.css';
 
-function WorkflowCanvas() {
+const WorkflowCanvas = forwardRef((props, ref) => {
   const [workflowItems, setWorkflowItems] = useState([]);
 
-  // For now, we simulate adding an item (later this will be done through drag-and-drop)
   const addItem = () => {
     setWorkflowItems([
       ...workflowItems,
-      { name: 'Brain Extraction', timeToComplete: Math.floor(Math.random() * 100) }
+      {
+        name: 'Brain Extraction',
+        timeToComplete: Math.floor(Math.random() * 100),
+      },
     ]);
   };
 
   return (
-    <div className="workflow-canvas">
+    <div className="workflow-canvas" ref={ref}>
       <button onClick={addItem}>Add Workflow Item</button>
       {workflowItems.map((item, index) => (
         <WorkflowItem
@@ -25,6 +27,6 @@ function WorkflowCanvas() {
       ))}
     </div>
   );
-}
+});
 
 export default WorkflowCanvas;

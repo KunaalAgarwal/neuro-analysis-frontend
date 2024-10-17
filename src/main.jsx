@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import ReactDOM from 'react-dom/client';
 import ActionsBar from './components/actionsBar';
 import HeaderBar from './components/headerBar';
@@ -10,13 +10,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/background.css';
 
 function App() {
+    const canvasRef = useRef(null);
     return (
       <div className="app-layout">
         <HeaderBar />
         <ActionsBar />
         <div className="d-flex" style={{ height: 'calc(100vh - 160px)' }}>
-          <WorkflowMenu />
-          <WorkflowCanvas />
+          <WorkflowMenu canvasRef={canvasRef}/>
+          <WorkflowCanvas ref={canvasRef}/>
         </div>
         <ToggleWorkflowBar />
       </div>
