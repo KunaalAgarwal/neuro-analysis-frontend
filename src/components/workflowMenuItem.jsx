@@ -4,8 +4,8 @@ import '../styles/workflowMenuItem.css';
 
 function WorkflowMenuItem({ name }) {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'WORKFLOW_ITEM', // Drag type must match useDrop accept
-    item: { type: 'WORKFLOW_ITEM', name }, // Pass necessary props
+    type: 'WORKFLOW_ITEM', 
+    item: { type: 'WORKFLOW_ITEM', name }, 
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -14,7 +14,7 @@ function WorkflowMenuItem({ name }) {
   return (
     <div
       ref={drag}
-      className="workflow-menu-item"
+      className="workflow-menu-item" 
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       {name}

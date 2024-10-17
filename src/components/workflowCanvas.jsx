@@ -18,22 +18,24 @@ function WorkflowCanvas() {
   drop(canvasRef); // Ensure drop is registered on the canvas
 
   const handleDrop = (item, monitor) => {
-    const canvasRect = canvasRef.current.getBoundingClientRect(); // Canvas boundaries
-    const clientOffset = monitor.getClientOffset(); // Mouse position at drop
-
-    console.log('Client Offset:', clientOffset);
-    console.log('Canvas Rect:', canvasRect);
-
-    // Calculate relative position within canvas
+    const canvasRect = canvasRef.current.getBoundingClientRect();
+    const clientOffset = monitor.getClientOffset();
+  
+    // Calculate the relative position within the canvas
     const x = clientOffset.x - canvasRect.left;
     const y = clientOffset.y - canvasRect.top;
-
+  
+    console.log('Client Offset:', clientOffset);
+    console.log('Canvas Rect:', canvasRect);
     console.log('Calculated Position:', { x, y });
-
-    // Add the item to the canvas with the calculated position
+  
+    // Ensure the item is within canvas bounds
+    const clampedX = Math.max(0, Math.min(x, canvasRect.width));
+    const clampedY = Math.max(0, Math.min(y, canvasRect.height));
+  
     setWorkflowItems((prevItems) => [
       ...prevItems,
-      { name: item.name, position: { x, y } },
+      { name: item.name, position: { x: clampedX, y: clampedY } },
     ]);
   };
 

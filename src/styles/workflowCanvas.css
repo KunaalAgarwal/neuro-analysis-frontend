@@ -3,6 +3,7 @@
 .workflow-canvas {
   position: relative;
   overflow: auto;
+  width: 100%;
   flex-grow: 1;
   margin: 20px;
   margin-bottom: 140px; /* Space for ToggleWorkflowBar */

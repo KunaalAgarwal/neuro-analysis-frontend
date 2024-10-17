@@ -9,7 +9,7 @@ function WorkflowItem({ name, position }) {
         className="workflow-item"
         style={{ position: 'absolute', top: position.y, left: position.x }}
       >
-        <p>{name}</p>
+        <p className='text'>{name}</p>
       </div>
     </Draggable>
   );
