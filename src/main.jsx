@@ -20,7 +20,7 @@ function App() {
     setCurrentWorkspace,
     addNewWorkspace,
     clearCurrentWorkspace,
-  } = useWorkspaces(); // Use the custom hook
+  } = useWorkspaces();
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -30,7 +30,7 @@ function App() {
           onNewWorkspace={addNewWorkspace} 
           onClearWorkspace={clearCurrentWorkspace} 
         />
-        <div className="d-flex" style={{ height: 'calc(100vh - 160px)' }}>
+        <div className="d-flex">
           <WorkflowMenu />
           <WorkflowCanvas items={workspaces[currentWorkspace]} />
         </div>

@@ -1,19 +1,53 @@
 import React from 'react';
 import '../styles/toggleWorkflowBar.css';
 
-function ToggleWorkflowBar() {
+function ToggleWorkflowBar({ workspaces, current, onChange }) {
+  const maxVisiblePages = 5; // Max number of pages displayed
+
+  const getPagesToDisplay = () => {
+    const total = workspaces.length;
+    if (total <= maxVisiblePages) return [...Array(total).keys()];
+
+    if (current < maxVisiblePages - 2) return [...Array(maxVisiblePages).keys()];
+    if (current >= total - (maxVisiblePages - 2)) {
+      return [...Array(maxVisiblePages).keys()].map(i => total - maxVisiblePages + i);
+    }
+    return [0, '...', current, '...', total - 1];
+  };
+
   return (
     <div className="toggle-workflow-bar">
-      <button className="button">&larr; Previous</button>
+      <button
+        className="btn-secondary"
+        disabled={current === 0}
+        onClick={() => onChange(current - 1)}
+      >
+        ← Previous
+      </button>
+
       <div className="page-numbers">
-        <span>1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>...</span>
-        <span>67</span>
-        <span>68</span>
+        {getPagesToDisplay().map((page, index) =>
+          page === '...' ? (
+            <span key={index}>...</span>
+          ) : (
+            <span
+              key={index}
+              className={page === current ? 'active' : ''}
+              onClick={() => onChange(page)}
+            >
+              {page + 1}
+            </span>
+          )
+        )}
       </div>
-      <button className="button">Next &rarr;</button>
+
+      <button
+        className="btn-secondary"
+        disabled={current === workspaces.length - 1}
+        onClick={() => onChange(current + 1)}
+      >
+        Next →
+      </button>
     </div>
   );
 }

@@ -1,37 +1,41 @@
 .toggle-workflow-bar {
-    position: fixed;
-    bottom: clamp(5px, 2vh, 10px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: clamp(300px, 60%, 800px);
-    padding: clamp(8px, 1vw, 12px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: rgba(46, 46, 46, 0.9);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
-    backdrop-filter: blur(6px); 
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 1000; 
-  }
-  
-  .page-numbers {
-    display: flex;
-    gap: clamp(6px, 1vw, 12px);
-  }
-  
-  .page-numbers span {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: clamp(0.8rem, 1.5vw, 1.2rem); 
-    color: white;
-    cursor: pointer;  
+  position: absolute;
+  bottom: clamp(10px, 2vh, 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(300px, 60%, 800px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(46, 46, 46, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+}
 
-    transition: transform 0.2s ease;
-  }
-  
-  .page-numbers span:hover {
-    transform: scale(1.1);
-    color: #b0b0b0;
-  }
+
+.page-numbers {
+  display: flex;
+  gap: 10px;
+}
+
+.page-numbers span {
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+  color: white;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.page-numbers span:hover {
+  transform: scale(1.1);
+  color: #b0b0b0;
+}
+
+.page-numbers .active {
+  font-weight: 700;
+  color: #4caf50;
+}
