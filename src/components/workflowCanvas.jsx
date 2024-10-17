@@ -1,8 +1,8 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState } from 'react';
 import WorkflowItem from './workflowItem';
 import '../styles/workflowCanvas.css';
 
-const WorkflowCanvas = forwardRef((props, ref) => {
+function WorkflowCanvas() {
   const [workflowItems, setWorkflowItems] = useState([]);
 
   const addItem = () => {
@@ -16,7 +16,7 @@ const WorkflowCanvas = forwardRef((props, ref) => {
   };
 
   return (
-    <div className="workflow-canvas" ref={ref}>
+    <div className="workflow-canvas">
       <button onClick={addItem}>Add Workflow Item</button>
       {workflowItems.map((item, index) => (
         <WorkflowItem
@@ -27,6 +27,6 @@ const WorkflowCanvas = forwardRef((props, ref) => {
       ))}
     </div>
   );
-});
+}
 
 export default WorkflowCanvas;
