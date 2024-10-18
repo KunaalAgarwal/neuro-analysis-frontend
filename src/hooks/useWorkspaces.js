@@ -1,16 +1,10 @@
 import { useState, useEffect } from 'react';
 
 export function useWorkspaces() {
-  const [workspaces, setWorkspaces] = useState(() => {
-    const savedWorkspaces = JSON.parse(localStorage.getItem('workspaces')) || [[]];
-    return savedWorkspaces;
-  });
+  const [workspaces, setWorkspaces] = useState([[]]);
+  const [currentWorkspace, setCurrentWorkspace] = useState(0);
 
-  const [currentWorkspace, setCurrentWorkspace] = useState(() => {
-    const savedIndex = parseInt(localStorage.getItem('currentWorkspace'), 10) || 0;
-    return savedIndex;
-  });
-
+  // Save workspaces to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('workspaces', JSON.stringify(workspaces));
   }, [workspaces]);
@@ -20,14 +14,24 @@ export function useWorkspaces() {
   }, [currentWorkspace]);
 
   const addNewWorkspace = () => {
-    setWorkspaces([...workspaces, []]);
-    setCurrentWorkspace(workspaces.length);
+    setWorkspaces((prevWorkspaces) => [...prevWorkspaces, []]);
+    setCurrentWorkspace(workspaces.length); // Switch to the new workspace
   };
 
   const clearCurrentWorkspace = () => {
-    const updatedWorkspaces = [...workspaces];
-    updatedWorkspaces[currentWorkspace] = [];
-    setWorkspaces(updatedWorkspaces);
+    setWorkspaces((prevWorkspaces) => {
+      const updatedWorkspaces = [...prevWorkspaces];
+      updatedWorkspaces[currentWorkspace] = [];
+      return updatedWorkspaces;
+    });
+  };
+
+  const updateCurrentWorkspaceItems = (newItems) => {
+    setWorkspaces((prevWorkspaces) => {
+      const updatedWorkspaces = [...prevWorkspaces];
+      updatedWorkspaces[currentWorkspace] = newItems;
+      return updatedWorkspaces;
+    });
   };
 
   return {
@@ -36,5 +40,6 @@ export function useWorkspaces() {
     setCurrentWorkspace,
     addNewWorkspace,
     clearCurrentWorkspace,
+    updateCurrentWorkspaceItems,
   };
 }

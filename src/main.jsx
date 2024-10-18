@@ -18,6 +18,7 @@ function App() {
     setCurrentWorkspace,
     addNewWorkspace,
     clearCurrentWorkspace,
+    updateCurrentWorkspaceItems,
   } = useWorkspaces();
 
   return (
@@ -30,22 +31,21 @@ function App() {
         />
         <div className="d-flex">
           <WorkflowMenu />
-          {workspaces.map((_, index) => (
-            <WorkflowCanvas 
-              key={index} 
-              index={index} 
-              visible={index === currentWorkspace} 
-            />
-          ))}
+          <WorkflowCanvas 
+            index={currentWorkspace} 
+            workflowItems={workspaces[currentWorkspace]} 
+            updateCurrentWorkspaceItems={updateCurrentWorkspaceItems} 
+          />
         </div>
         <ToggleWorkflowBar 
-          workspaces={workspaces} 
           current={currentWorkspace} 
+          workspaces={workspaces} 
           onChange={setCurrentWorkspace} 
         />
       </div>
     </DndProvider>
   );
 }
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
