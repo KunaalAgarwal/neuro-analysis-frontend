@@ -32,7 +32,6 @@ function App() {
         <div className="d-flex">
           <WorkflowMenu />
           <WorkflowCanvas 
-            index={currentWorkspace} 
             workflowItems={workspaces[currentWorkspace]} 
             updateCurrentWorkspaceItems={updateCurrentWorkspaceItems} 
           />

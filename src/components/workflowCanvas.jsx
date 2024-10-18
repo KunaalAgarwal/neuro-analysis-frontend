@@ -3,7 +3,7 @@ import { useDrop } from 'react-dnd';
 import WorkflowItem from './workflowItem';
 import '../styles/workflowCanvas.css';
 
-function WorkflowCanvas({ index, workflowItems, updateCurrentWorkspaceItems }) {
+function WorkflowCanvas({workflowItems, updateCurrentWorkspaceItems }) {
   const canvasRef = useRef(null);
 
   const [{ isOver }, drop] = useDrop({

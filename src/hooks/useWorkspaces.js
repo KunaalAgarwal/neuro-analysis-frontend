@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react';
 
 export function useWorkspaces() {
-  const [workspaces, setWorkspaces] = useState([[]]);
-  const [currentWorkspace, setCurrentWorkspace] = useState(0);
+  // Initialize state from localStorage or use defaults if nothing is stored
+  const [workspaces, setWorkspaces] = useState(() => {
+    const savedWorkspaces = JSON.parse(localStorage.getItem('workspaces'));
+    return savedWorkspaces ? savedWorkspaces : [[]]; // Default to a blank workspace
+  });
+
+  const [currentWorkspace, setCurrentWorkspace] = useState(() => {
+    const savedIndex = parseInt(localStorage.getItem('currentWorkspace'), 10);
+    return !isNaN(savedIndex) ? savedIndex : 0; // Default to the first workspace
+  });
 
   // Save workspaces to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('workspaces', JSON.stringify(workspaces));
   }, [workspaces]);
 
+  // Save the current workspace index to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('currentWorkspace', currentWorkspace);
   }, [currentWorkspace]);
