@@ -1,31 +1,36 @@
 .actions-bar {
-    width: clamp(400px, 45%, 600px);
-    margin: 0 auto clamp(8px, 2vw, 15px) auto;
-    padding: clamp(8px, 1.5vw, 15px);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background-color: rgba(46, 46, 46, 0.9);
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .actions-bar .separator {
-    height: clamp(40px, 5vw, 60px);
-    width: 2px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    margin: clamp(8px, 1vw, 12px) clamp(12px, 2vw, 20px);
+  width: clamp(200px, 60%, 750px);  
+  margin: 0 auto clamp(8px, 2vw, 15px) auto;
+  padding: clamp(8px, 1.5vw, 15px);
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: rgba(46, 46, 46, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  }
-  
-  .btn-primary {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .btn-primary:hover {
-    background-color: #0056b3;
-  }
+.actions-bar .separator {
+  height: clamp(5px, 4vw, 60px);
+  width: 2px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  margin: clamp(4px, 1vw, 12px) clamp(4px, 2vw, 20px);
+
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.actions-button {
+  font-size: clamp(0.2rem, 1.2vw, 1.0rem);
+  padding: clamp(5px, 1vw, 12px) clamp(5px, 2vw, 20px);
+}

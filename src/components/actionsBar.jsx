@@ -1,13 +1,15 @@
 import React from 'react';
 import '../styles/actionsBar.css';
 
-const ActionsBar = ({ onNewWorkspace,  onClearWorkspace}) => (
+const ActionsBar = ({ onNewWorkspace,  onClearWorkspace, onRemoveWorkspace}) => (
   <div className="actions-bar">
-    <button onClick={onNewWorkspace}>New Workspace</button>
+    <button className="actions-button" onClick={onNewWorkspace}>New Workspace</button>
     <div className="separator"></div>
-    <button onClick={onClearWorkspace}>Clear Workspace</button>
+    <button className="actions-button" onClick={onClearWorkspace}>Clear Workspace</button>
     <div className="separator"></div>
-    <button className="btn-primary btn-lg">Generate Workflow</button>
+    <button className="actions-button" onClick={onRemoveWorkspace}>Remove Workspace</button>
+    <div className="separator"></div>
+    <button className="actions-button btn-primary btn-lg">Generate Workflow</button>
   </div>
 );
 

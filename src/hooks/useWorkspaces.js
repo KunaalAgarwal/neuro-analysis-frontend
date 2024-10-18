@@ -43,6 +43,22 @@ export function useWorkspaces() {
     });
   };
 
+  const removeCurrentWorkspace = () => {
+    setWorkspaces((prevWorkspaces) => {
+      if (prevWorkspaces.length === 1) {
+        // Prevent removing the last remaining workspace
+        return prevWorkspaces;
+      }
+      const updatedWorkspaces = prevWorkspaces.filter(
+        (_, index) => index !== currentWorkspace
+      );  
+      if (currentWorkspace >= updatedWorkspaces.length) {
+        setCurrentWorkspace(updatedWorkspaces.length - 1);
+      }
+      return updatedWorkspaces;
+    });
+  };
+
   return {
     workspaces,
     currentWorkspace,
@@ -50,5 +66,6 @@ export function useWorkspaces() {
     addNewWorkspace,
     clearCurrentWorkspace,
     updateCurrentWorkspaceItems,
+    removeCurrentWorkspace
   };
 }

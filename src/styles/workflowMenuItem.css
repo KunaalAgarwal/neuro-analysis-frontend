@@ -3,7 +3,7 @@
     padding: clamp(8px, 1vw, 12px);
     background-color: #3a3a3a;
     color: #e0e0e0;
-    font-size: clamp(0.4rem, 1.2vw, 1.0rem);
+    font-size: clamp(0.2rem, 1.2vw, 1.0rem);
     font-weight: 500;
     border-radius: 10px;
     text-align: center;

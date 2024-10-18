@@ -19,6 +19,7 @@ function App() {
     addNewWorkspace,
     clearCurrentWorkspace,
     updateCurrentWorkspaceItems,
+    removeCurrentWorkspace
   } = useWorkspaces();
 
   return (
@@ -28,6 +29,7 @@ function App() {
         <ActionsBar 
           onNewWorkspace={addNewWorkspace} 
           onClearWorkspace={clearCurrentWorkspace} 
+          onRemoveWorkspace={removeCurrentWorkspace}
         />
         <div className="d-flex">
           <WorkflowMenu />
