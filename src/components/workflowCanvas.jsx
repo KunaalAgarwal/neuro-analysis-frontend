@@ -1,51 +1,45 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import WorkflowItem from './workflowItem';
 import '../styles/workflowCanvas.css';
 
-function WorkflowCanvas() {
-  const [workflowItems, setWorkflowItems] = useState([]);
+function WorkflowCanvas({ index, visible }) {
   const canvasRef = useRef(null);
+  const [workflowItems, setWorkflowItems] = useState(() => {
+    const workspaces = JSON.parse(localStorage.getItem('workspaces')) || [[]];
+    return workspaces[index] || [];
+  });
 
   const [{ isOver }, drop] = useDrop({
     accept: 'WORKFLOW_ITEM',
-    drop: (item, monitor) => handleDrop(item, monitor),
+    drop: (item) => handleDrop(item),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
   });
 
-  drop(canvasRef); // Ensure drop is registered on the canvas
+  drop(canvasRef); // Register the drop target
 
-  const handleDrop = (item, monitor) => {
-    const canvasRect = canvasRef.current.getBoundingClientRect();
-    const clientOffset = monitor.getClientOffset();
-  
-    // Calculate the relative position within the canvas
-    const x = clientOffset.x - canvasRect.left;
-    const y = clientOffset.y - canvasRect.top;
-  
-    console.log('Client Offset:', clientOffset);
-    console.log('Canvas Rect:', canvasRect);
-    console.log('Calculated Position:', { x, y });
-  
-    // Ensure the item is within canvas bounds
-    const clampedX = Math.max(0, Math.min(x, canvasRect.width));
-    const clampedY = Math.max(0, Math.min(y, canvasRect.height));
-  
-    setWorkflowItems((prevItems) => [
-      ...prevItems,
-      { name: item.name, position: { x: clampedX, y: clampedY } },
-    ]);
+  useEffect(() => {
+    const workspaces = JSON.parse(localStorage.getItem('workspaces')) || [[]];
+    workspaces[index] = workflowItems;
+    localStorage.setItem('workspaces', JSON.stringify(workspaces));
+  }, [workflowItems, index]);
+
+  const handleDrop = (item) => {
+    const newItem = { name: item.name, position: { x: 10, y: 10 } };
+    setWorkflowItems((prevItems) => [...prevItems, newItem]);
   };
 
   return (
     <div
+      id={`workspace-${index}`} // Labeling with workspace index
       ref={canvasRef}
       className={`workflow-canvas ${isOver ? 'is-over' : ''}`}
+      style={{ display: visible ? 'block' : 'none' }} // Toggle visibility
     >
-      {workflowItems.map((item, index) => (
-        <WorkflowItem key={index} name={item.name} position={item.position} />
+      {workflowItems.map((item, idx) => (
+        <WorkflowItem key={idx} name={item.name} position={item.position} />
       ))}
     </div>
   );
