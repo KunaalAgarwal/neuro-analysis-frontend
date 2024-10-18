@@ -21,15 +21,17 @@ function WorkflowMenu() {
   };
 
   return (
-    <div className="workflow-menu">
-      {items.map((item, index) => (
-        <WorkflowMenuItem
-          key={index}
-          name={item}
-          onDragStart={handleDragStart}
-        />
-      ))}
-    </div>
+    <div className="workflow-menu-container">
+      <div className="workflow-menu">
+        {items.map((item, index) => (
+          <WorkflowMenuItem
+            key={index}
+            name={item}
+            onDragStart={handleDragStart}
+          />
+        ))}
+      </div>
+    </div>  
   );
 }
 
