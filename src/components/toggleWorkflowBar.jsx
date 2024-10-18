@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/toggleWorkflowBar.css';
 
 function ToggleWorkflowBar({ workspaces, current, onChange }) {
-  const maxVisiblePages = 5; // Max number of pages displayed
+  const maxVisiblePages = 5;
 
   const getPagesToDisplay = () => {
     const total = workspaces.length;
@@ -22,7 +22,7 @@ function ToggleWorkflowBar({ workspaces, current, onChange }) {
         disabled={current === 0}
         onClick={() => onChange(current - 1)}
       >
-        ← Previous
+        &#9664; Previous
       </button>
 
       <div className="page-numbers">
@@ -46,7 +46,7 @@ function ToggleWorkflowBar({ workspaces, current, onChange }) {
         disabled={current === workspaces.length - 1}
         onClick={() => onChange(current + 1)}
       >
-        Next →
+        Next &#9654;
       </button>
     </div>
   );

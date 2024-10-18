@@ -39,3 +39,9 @@
   font-weight: 700;
   color: #4caf50;
 }
+
+.btn-secondary:disabled {
+  opacity: 0.5; 
+  cursor: not-allowed;  
+  background-color: #444; 
+}
