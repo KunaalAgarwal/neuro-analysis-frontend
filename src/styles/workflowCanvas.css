@@ -26,3 +26,30 @@
   background-color: rgba(240, 240, 240, 0.9);
   color: black;
 }
+
+/* Target default ReactFlow nodes */
+.custom-node {
+  background-color: #9c169c !important; /* Ensure this color applies */
+  color: #000000 !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.react-flow__node-default:hover {
+  background-color: #f0f0f0 !important;
+  transform: scale(1.05); /* Slight zoom on hover */
+}
+
+/* Adjust labels to ensure they display correctly */
+.react-flow__node-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -1,35 +1,87 @@
-import React, { useRef, useState } from 'react';
-import { useDrop } from 'react-dnd';
-import WorkflowItem from './workflowItem';
-import '../styles/workflowCanvas.css';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
+import ReactFlow, { addEdge, Background, Controls, MiniMap, applyNodeChanges, applyEdgeChanges } from 'reactflow';
+import 'reactflow/dist/style.css';
 
-function WorkflowCanvas({workflowItems, updateCurrentWorkspaceItems }) {
-  const canvasRef = useRef(null);
+function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems }) {
+  const reactFlowWrapper = useRef(null);
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
 
-  const [{ isOver }, drop] = useDrop({
-    accept: 'WORKFLOW_ITEM',
-    drop: (item) => handleDrop(item),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  });
+  // Initialize nodes from workflowItems on component mount or update
+  useEffect(() => {
+    const initialNodes = workflowItems.map((item, idx) => ({
+      id: `${idx}`,
+      type: 'default',
+      data: { label: item.data.label },
+      position: item.position || { x: 100 + idx * 50, y: 100 },
+      className: 'custom-node'
+    }));
+    setNodes(initialNodes);
+  }, [workflowItems]);
 
-  drop(canvasRef); // Register the canvas as a drop target
+  const onNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
 
-  const handleDrop = (item) => {
-    const newItem = { name: item.name, position: { x: 10, y: 10 } }; // Temporary fixed position
-    const updatedItems = [...workflowItems, newItem];
-    updateCurrentWorkspaceItems(updatedItems); // Use the hook function to update
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    []
+  );
+
+  const onConnect = useCallback(
+    (connection) => setEdges((eds) => addEdge(connection, eds)),
+    []
+  );
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    const name = event.dataTransfer.getData('node/name') || 'Unnamed Node';
+
+    const position = {
+      x: event.clientX - reactFlowBounds.left,
+      y: event.clientY - reactFlowBounds.top,
+    };
+
+    const newNode = {
+      id: `${nodes.length}`,
+      type: 'default',
+      data: { label: name }, 
+      position,
+      className: 'custom-node'
+    };
+
+    const updatedNodes = [...nodes, newNode];
+    setNodes(updatedNodes);
+    updateCurrentWorkspaceItems(updatedNodes); //sync state
   };
 
   return (
     <div
-      ref={canvasRef}
-      className={`workflow-canvas ${isOver ? 'is-over' : ''}`}
+      ref={reactFlowWrapper}
+      className="workflow-canvas"
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      style={{ height: '100%', width: '100%' }}
     >
-      {workflowItems.map((item, idx) => (
-        <WorkflowItem key={idx} name={item.name} position={item.position} />
-      ))}
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        fitView
+      >
+        <MiniMap />
+        <Background variant="dots" gap={12} size={1} />
+        <Controls />
+      </ReactFlow>
     </div>
   );
 }

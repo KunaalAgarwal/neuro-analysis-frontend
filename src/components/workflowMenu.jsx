@@ -15,13 +15,20 @@ function WorkflowMenu() {
     'Feature Extraction',
   ];
 
+  const handleDragStart = (event, name) => {
+    event.dataTransfer.setData('node/name', name);
+    console.log(`Dragging: ${name}`);
+  };
+
   return (
-    <div className="workflow-menu-container">
-      <div className="workflow-menu">
-        {items.map((item, index) => (
-          <WorkflowMenuItem key={index} name={item} />
-        ))}
-      </div>
+    <div className="workflow-menu">
+      {items.map((item, index) => (
+        <WorkflowMenuItem
+          key={index}
+          name={item}
+          onDragStart={handleDragStart}
+        />
+      ))}
     </div>
   );
 }
