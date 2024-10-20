@@ -63,25 +63,27 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems }) {
   };
 
   return (
-    <div
-      ref={reactFlowWrapper}
-      className="workflow-canvas"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      style={{ height: '100%', width: '100%' }}
-    >
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
+    <div className="workflow-canvas" style={{ height: '100%', width: '100%' }}>
+      <div
+        ref={reactFlowWrapper}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        className="workflow-canvas"
+        style={{ height: '100%', width: '100%' }}
       >
-        <MiniMap />
-        <Background variant="dots" gap={12} size={1} />
-        <Controls />
-      </ReactFlow>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+        >
+          <MiniMap />
+          <Background variant="dots" gap={12} size={1} />
+          <Controls />
+        </ReactFlow>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,5 @@
+programmatic generation of the container (singularity)
+which could then be run
+
+singularity (apptainer) recpies
+.sif 
