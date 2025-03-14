@@ -21,28 +21,30 @@ function App() {
   } = useWorkspaces();
 
   return (
-    <div>
-      <div className="app-layout">
-        <HeaderBar />
-        <ActionsBar 
-          onNewWorkspace={addNewWorkspace} 
-          onClearWorkspace={clearCurrentWorkspace} 
-          onRemoveWorkspace={removeCurrentWorkspace}
-        />
-        <div className="d-flex">
-          <WorkflowMenu />
-          <WorkflowCanvas 
-            workflowItems={workspaces[currentWorkspace]} 
-            updateCurrentWorkspaceItems={updateCurrentWorkspaceItems} 
+      <div>
+        <div className="app-layout">
+          <HeaderBar />
+          <ActionsBar
+              onNewWorkspace={addNewWorkspace}
+              onClearWorkspace={clearCurrentWorkspace}
+              onRemoveWorkspace={removeCurrentWorkspace}
+              // Pass down workspaceCount as a prop
+              workspaceCount={workspaces.length}
+          />
+          <div className="d-flex">
+            <WorkflowMenu />
+            <WorkflowCanvas
+                workflowItems={workspaces[currentWorkspace]}
+                updateCurrentWorkspaceItems={updateCurrentWorkspaceItems}
+            />
+          </div>
+          <ToggleWorkflowBar
+              current={currentWorkspace}
+              workspaces={workspaces}
+              onChange={setCurrentWorkspace}
           />
         </div>
-        <ToggleWorkflowBar 
-          current={currentWorkspace} 
-          workspaces={workspaces} 
-          onChange={setCurrentWorkspace} 
-        />
       </div>
-    </div>
   );
 }
 
