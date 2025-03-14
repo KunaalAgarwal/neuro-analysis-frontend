@@ -1,11 +1,11 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import ReactFlow, {
   addEdge,
-  applyNodeChanges,
-  applyEdgeChanges,
   Background,
   Controls,
-  MiniMap
+  MiniMap,
+  applyNodeChanges,
+  applyEdgeChanges
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -17,13 +17,14 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
 
   useEffect(() => {
     const initialNodes = workflowItems.map((item, idx) => ({
-      id: String(idx),
+      id: `${idx}`,
       type: 'default',
       data: { label: item.data.label },
       position: item.position || { x: 100 + idx * 50, y: 100 },
       className: 'custom-node'
     }));
     setNodes(initialNodes);
+    setEdges([]); // Clear edges when workspace is cleared
   }, [workflowItems]);
 
   const onNodesChange = useCallback(
@@ -36,18 +37,21 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
       []
   );
 
-  const onConnect = useCallback((connection) => {
-    setEdges((eds) =>
-        addEdge(
-            {
-              ...connection,
-              markerEnd: { type: 'arrowclosed', width: 10, height: 10 },
-              style: { strokeWidth: 2 },
-            },
-            eds
-        )
-    );
-  }, []);
+  const onConnect = useCallback(
+      (connection) => {
+        setEdges((eds) =>
+            addEdge(
+                {
+                  ...connection,
+                  markerEnd: { type: 'arrowclosed', width: 10, height: 10 },
+                  style: { strokeWidth: 2 }
+                },
+                eds
+            )
+        );
+      },
+      []
+  );
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -60,17 +64,14 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
 
     if (!reactFlowInstance) return;
 
-    const flowPosition = reactFlowInstance.screenToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
+    const flowPosition = reactFlowInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
     const newNode = {
-      id: String(nodes.length),
+      id: `${nodes.length}`,
       type: 'default',
       data: { label: name },
       position: flowPosition,
-      className: 'custom-node',
+      className: 'custom-node'
     };
 
     const updatedNodes = [...nodes, newNode];
@@ -78,23 +79,22 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     updateCurrentWorkspaceItems(updatedNodes);
   };
 
-  // This function returns the workflow data the parent needs
+  // Function to return nodes and edges
   const getWorkflowData = () => ({
-    nodes: nodes.map((node) => ({
+    nodes: nodes.map(node => ({
       id: node.id,
       label: node.data.label,
-      position: node.position,
+      position: node.position
     })),
-    edges: edges.map((edge) => ({
+    edges: edges.map(edge => ({
       source: edge.source,
-      target: edge.target,
-    })),
+      target: edge.target
+    }))
   });
 
-  // On every render, provide the parent with a fresh function reference
+  // Pass function up to App
   useEffect(() => {
     if (onSetWorkflowData) {
-      // Must pass a FUNCTION here, not the result of getWorkflowData()
       onSetWorkflowData(() => getWorkflowData);
     }
   }, [nodes, edges, onSetWorkflowData]);
