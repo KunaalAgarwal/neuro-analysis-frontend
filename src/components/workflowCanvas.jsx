@@ -69,7 +69,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems }) {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         className="workflow-canvas"
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '79%', width: '99%' }}
       >
         <ReactFlow
           nodes={nodes}
