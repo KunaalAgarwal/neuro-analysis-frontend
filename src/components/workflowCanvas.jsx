@@ -5,14 +5,16 @@ import ReactFlow, {
   Controls,
   MiniMap,
   applyNodeChanges,
-  applyEdgeChanges
+  applyEdgeChanges,
+  useNodesState,
+  useEdgesState
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkflowData }) {
   const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
   useEffect(() => {
@@ -24,34 +26,21 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
       className: 'custom-node'
     }));
     setNodes(initialNodes);
-    setEdges([]); // Clear edges when workspace is cleared
+    setEdges([]); // Reset edges on workspace clear
   }, [workflowItems]);
 
-  const onNodesChange = useCallback(
-      (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-      []
-  );
-
-  const onEdgesChange = useCallback(
-      (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-      []
-  );
-
-  const onConnect = useCallback(
-      (connection) => {
-        setEdges((eds) =>
-            addEdge(
-                {
-                  ...connection,
-                  markerEnd: { type: 'arrowclosed', width: 10, height: 10 },
-                  style: { strokeWidth: 2 }
-                },
-                eds
-            )
-        );
-      },
-      []
-  );
+  const onConnect = useCallback((connection) => {
+    setEdges((eds) =>
+        addEdge(
+            {
+              ...connection,
+              markerEnd: { type: 'arrowclosed', width: 10, height: 10 },
+              style: { strokeWidth: 2 },
+            },
+            eds
+        )
+    );
+  }, []);
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -64,14 +53,17 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
 
     if (!reactFlowInstance) return;
 
-    const flowPosition = reactFlowInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY });
+    const flowPosition = reactFlowInstance.screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
 
     const newNode = {
       id: `${nodes.length}`,
       type: 'default',
       data: { label: name },
       position: flowPosition,
-      className: 'custom-node'
+      className: 'custom-node',
     };
 
     const updatedNodes = [...nodes, newNode];
@@ -79,7 +71,20 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     updateCurrentWorkspaceItems(updatedNodes);
   };
 
-  // Function to return nodes and edges
+  // Detect node deletions (via Backspace/Delete key)
+  const onNodesDelete = useCallback((deletedNodes) => {
+    setNodes((prevNodes) => {
+      const updatedNodes = prevNodes.filter(node => !deletedNodes.find(deleted => deleted.id === node.id));
+      updateCurrentWorkspaceItems(updatedNodes); // Sync with localStorage
+      return updatedNodes;
+    });
+
+    // Remove edges linked to deleted nodes
+    setEdges((prevEdges) => prevEdges.filter(edge =>
+        !deletedNodes.some(node => edge.source === node.id || edge.target === node.id)
+    ));
+  }, [updateCurrentWorkspaceItems]);
+
   const getWorkflowData = () => ({
     nodes: nodes.map(node => ({
       id: node.id,
@@ -92,7 +97,6 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     }))
   });
 
-  // Pass function up to App
   useEffect(() => {
     if (onSetWorkflowData) {
       onSetWorkflowData(() => getWorkflowData);
@@ -114,6 +118,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              onNodesDelete={onNodesDelete}  // Handles node deletion
               fitView
               onInit={(instance) => setReactFlowInstance(instance)}
           >
