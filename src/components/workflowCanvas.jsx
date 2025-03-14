@@ -36,9 +36,23 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems }) {
       (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
       []
   );
-
   const onConnect = useCallback(
-      (connection) => setEdges((eds) => addEdge(connection, eds)),
+      (connection) => {
+        setEdges((eds) =>
+            addEdge(
+                {
+                  ...connection,
+                  markerEnd: {
+                    type: 'arrowclosed', // filled in arrowhead
+                    width: 10,
+                    height: 10,
+                  },
+                  style: { strokeWidth: 2 } //edge thickness
+                },
+                eds
+            )
+        );
+      },
       []
   );
 
