@@ -6,6 +6,7 @@ import WorkflowMenu from './components/workflowMenu';
 import ToggleWorkflowBar from './components/toggleWorkflowBar';
 import WorkflowCanvas from './components/workflowCanvas';
 import { useWorkspaces } from './hooks/useWorkspaces';
+import { useGenerateWorkflow } from './hooks/generateWorkflow';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/background.css';
 
@@ -20,6 +21,8 @@ function App() {
     removeCurrentWorkspace
   } = useWorkspaces();
 
+    const { generateWorkflow } = useGenerateWorkflow();
+
   return (
       <div>
         <div className="app-layout">
@@ -30,6 +33,7 @@ function App() {
               onRemoveWorkspace={removeCurrentWorkspace}
               // Pass down workspaceCount as a prop
               workspaceCount={workspaces.length}
+              onGenerateWorkflow={generateWorkflow}
           />
           <div className="d-flex">
             <WorkflowMenu />
