@@ -4,12 +4,22 @@ import ReactFlow, {
   Background,
   Controls,
   MiniMap,
-  applyNodeChanges,
-  applyEdgeChanges,
   useNodesState,
   useEdgesState
 } from 'reactflow';
+
+// Styling files
 import 'reactflow/dist/style.css';
+import '../styles/workflowCanvas.css';
+import '../styles/actionsBar.css';
+
+
+// Components
+import NodeComponent from "./NodeComponent";
+
+const nodeTypes = {
+  default: NodeComponent
+};
 
 function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkflowData }) {
   const reactFlowWrapper = useRef(null);
@@ -17,18 +27,31 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
+  // Load nodes from workspace on mount/update
   useEffect(() => {
     const initialNodes = workflowItems.map((item, idx) => ({
       id: `${idx}`,
       type: 'default',
-      data: { label: item.data.label },
-      position: item.position || { x: 100 + idx * 50, y: 100 },
-      className: 'custom-node'
+      data: { label: item.data.label, parameters: item.data.parameters || "" },
+      position: item.position || { x: 100 + idx * 50, y: 100 }
     }));
     setNodes(initialNodes);
     setEdges([]); // Reset edges on workspace clear
   }, [workflowItems]);
 
+  // Function to update a node’s parameters
+  const handleNodeUpdate = (nodeId, updatedParameters) => {
+    setNodes((prevNodes) => {
+      const updatedNodes = prevNodes.map(node =>
+          node.id === nodeId ? { ...node, data: { ...node.data, parameters: updatedParameters } } : node
+      );
+
+      updateCurrentWorkspaceItems(updatedNodes); // Sync with local storage
+      return updatedNodes;
+    });
+  };
+
+  // Handle new connections
   const onConnect = useCallback((connection) => {
     setEdges((eds) =>
         addEdge(
@@ -42,6 +65,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     );
   }, []);
 
+  // Handle drag-and-drop of new nodes
   const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -61,9 +85,8 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     const newNode = {
       id: `${nodes.length}`,
       type: 'default',
-      data: { label: name },
-      position: flowPosition,
-      className: 'custom-node',
+      data: { label: name, parameters: "" }, // Initialize with empty parameters
+      position: flowPosition
     };
 
     const updatedNodes = [...nodes, newNode];
@@ -75,7 +98,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
   const onNodesDelete = useCallback((deletedNodes) => {
     setNodes((prevNodes) => {
       const updatedNodes = prevNodes.filter(node => !deletedNodes.find(deleted => deleted.id === node.id));
-      updateCurrentWorkspaceItems(updatedNodes); // Sync with localStorage
+      updateCurrentWorkspaceItems(updatedNodes); // Sync with local storage
       return updatedNodes;
     });
 
@@ -85,10 +108,12 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     ));
   }, [updateCurrentWorkspaceItems]);
 
+  // Get workflow data for exporting
   const getWorkflowData = () => ({
     nodes: nodes.map(node => ({
       id: node.id,
       label: node.data.label,
+      parameters: node.data.parameters,
       position: node.position
     })),
     edges: edges.map(edge => ({
@@ -104,13 +129,12 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
   }, [nodes, edges, onSetWorkflowData]);
 
   return (
-      <div className="workflow-canvas" style={{ height: '100%', width: '100%' }}>
+      <div className="workflow-canvas">
         <div
             ref={reactFlowWrapper}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="workflow-canvas"
-            style={{ height: '81%', width: '99%' }}
+            className="workflow-canvas-container"
         >
           <ReactFlow
               nodes={nodes}
@@ -118,8 +142,9 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
-              onNodesDelete={onNodesDelete}  // Handles node deletion
+              onNodesDelete={onNodesDelete} // Handles node deletion
               fitView
+              nodeTypes={nodeTypes}
               onInit={(instance) => setReactFlowInstance(instance)}
           >
             <MiniMap />
