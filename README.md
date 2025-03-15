@@ -1,2 +1,6 @@
-# neuro-analysis_workflows
-Front-end for the Neuroanalysis workflow generator.
+# Neuroimaging Analysis Workflow Generator
+
+### Running Locally
+``npm run dev``
+
+

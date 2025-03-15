@@ -34,3 +34,9 @@
   font-size: clamp(0.2rem, 1.2vw, 1.0rem);
   padding: clamp(5px, 1vw, 12px) clamp(5px, 2vw, 20px);
 }
+
+.actions-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #444;
+}
