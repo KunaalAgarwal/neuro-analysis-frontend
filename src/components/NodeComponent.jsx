@@ -15,14 +15,18 @@ const NodeComponent = ({ data }) => {
 
     const handleOpenModal = () => {
         if (!textInput.trim()) {
-            setTextInput(defaultJson); // Set default JSON only if input is empty
+            setTextInput(defaultJson);
         }
         setShowModal(true);
     };
 
     const handleCloseModal = () => {
-        data.parameters = textInput;
         setShowModal(false);
+
+        // Use the callback from data to save parameters back up to the parent
+        if (typeof data.onSaveParameters === 'function') {
+            data.onSaveParameters(textInput);
+        }
     };
 
     const handleInputChange = (e) => {
@@ -32,40 +36,50 @@ const NodeComponent = ({ data }) => {
     const handleKeyDown = (e) => {
         if (e.key === 'Tab') {
             e.preventDefault(); // Prevent default tab behavior
-
-            const tabSpaces = "   "; // Insert 3 spaces
+            const tabSpaces = '   '; // Insert 3 spaces
             const { selectionStart, selectionEnd } = e.target;
             const newValue =
-                textInput.substring(0, selectionStart) + tabSpaces + textInput.substring(selectionEnd);
+                textInput.substring(0, selectionStart) +
+                tabSpaces +
+                textInput.substring(selectionEnd);
 
             setTextInput(newValue);
 
             // Move cursor forward by 3 spaces
             setTimeout(() => {
-                e.target.selectionStart = e.target.selectionEnd = selectionStart + tabSpaces.length;
+                e.target.selectionStart = e.target.selectionEnd =
+                    selectionStart + tabSpaces.length;
             }, 0);
         }
     };
 
     return (
         <>
+            {/* Double-click the node to open the modal */}
             <div onDoubleClick={handleOpenModal}>
                 {data.label}
                 <Handle type="target" position={Position.Top} />
                 <Handle type="source" position={Position.Bottom} />
             </div>
 
-            <Modal show={showModal} onHide={handleCloseModal} centered className="custom-modal">
+            <Modal
+                show={showModal}
+                onHide={handleCloseModal}
+                centered
+                className="custom-modal"
+            >
                 <Modal.Body onClick={(e) => e.stopPropagation()}>
                     <Form>
                         <Form.Group>
-                            <Form.Label className='modal-label'>Input parameters as a JSON Object.</Form.Label>
+                            <Form.Label className="modal-label">
+                                Input parameters as a JSON Object.
+                            </Form.Label>
                             <Form.Control
                                 as="textarea"
                                 rows={5}
                                 value={textInput}
                                 onChange={handleInputChange}
-                                onKeyDown={handleKeyDown} // Enables tab support (3 spaces)
+                                onKeyDown={handleKeyDown}
                                 className="code-input"
                                 spellCheck="false"
                                 autoCorrect="off"
