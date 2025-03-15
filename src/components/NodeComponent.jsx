@@ -5,15 +5,16 @@ import '../styles/workflowItem.css';
 
 const NodeComponent = ({ data }) => {
     const defaultJson = `{
-    parameter_1: false, 
-    parameter_2: 100,
-    parameter_3: 'multi-layer'
+    "parameter_1": false, 
+    "parameter_2": 100,
+    "parameter_3": "multi-layer"
 }`;
 
     const [showModal, setShowModal] = useState(false);
     const [textInput, setTextInput] = useState(data.parameters || '');
 
     const handleOpenModal = () => {
+        // If the text input is blank, replace with default JSON
         if (!textInput.trim()) {
             setTextInput(defaultJson);
         }
@@ -23,9 +24,14 @@ const NodeComponent = ({ data }) => {
     const handleCloseModal = () => {
         setShowModal(false);
 
-        // Use the callback from data to save parameters back up to the parent
+        // Attempt to parse; fallback to user’s raw text if invalid
         if (typeof data.onSaveParameters === 'function') {
-            data.onSaveParameters(textInput);
+            try {
+                data.onSaveParameters(JSON.parse(textInput));
+            } catch (err) {
+                alert('Invalid JSON entered. Storing raw text instead.');
+                data.onSaveParameters(textInput);
+            }
         }
     };
 
@@ -35,7 +41,7 @@ const NodeComponent = ({ data }) => {
 
     const handleKeyDown = (e) => {
         if (e.key === 'Tab') {
-            e.preventDefault(); // Prevent default tab behavior
+            e.preventDefault();
             const tabSpaces = '   '; // Insert 3 spaces
             const { selectionStart, selectionEnd } = e.target;
             const newValue =
@@ -55,7 +61,6 @@ const NodeComponent = ({ data }) => {
 
     return (
         <>
-            {/* Double-click the node to open the modal */}
             <div onDoubleClick={handleOpenModal}>
                 {data.label}
                 <Handle type="target" position={Position.Top} />
@@ -72,7 +77,7 @@ const NodeComponent = ({ data }) => {
                     <Form>
                         <Form.Group>
                             <Form.Label className="modal-label">
-                                Input parameters as a JSON Object.
+                                Input parameters as a JSON Object:
                             </Form.Label>
                             <Form.Control
                                 as="textarea"

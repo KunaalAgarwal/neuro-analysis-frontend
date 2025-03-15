@@ -24,8 +24,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
-  // Whenever the workflowItems array changes (or on mount),
-  // build up the local node state from it:
+  // Initialize local nodes from workflowItems
   useEffect(() => {
     const initialNodes = workflowItems.map((item, idx) => ({
       id: `${idx}`,
@@ -33,17 +32,17 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
       data: {
         label: item.data.label,
         parameters: item.data.parameters || '',
-        // Pass a callback to let the node save changes:
+        // A callback that NodeComponent will call on close
         onSaveParameters: (newParams) => handleNodeUpdate(`${idx}`, newParams),
       },
       position: item.position || { x: 100 + idx * 50, y: 100 },
     }));
 
     setNodes(initialNodes);
-    setEdges([]); // Reset edges each time
+    setEdges([]);
   }, [workflowItems]);
 
-  // Function to update a node’s parameters, called by onSaveParameters in the node
+  // Update a node’s parameters in local state and localStorage
   const handleNodeUpdate = (nodeId, updatedParameters) => {
     setNodes((prevNodes) => {
       const updatedNodes = prevNodes.map((node) =>
@@ -52,12 +51,13 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
               : node
       );
 
-      updateCurrentWorkspaceItems(updatedNodes); // Sync changes to local storage
+      // Persist to local storage via the custom hook
+      updateCurrentWorkspaceItems(updatedNodes);
       return updatedNodes;
     });
   };
 
-  // When connecting two nodes with an edge
+  // Connect edges
   const onConnect = useCallback((connection) => {
     setEdges((eds) =>
         addEdge(
@@ -71,7 +71,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     );
   }, []);
 
-  // Drag-and-drop new nodes from the WorkflowMenu
+  // Drag-and-drop new nodes
   const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -104,18 +104,17 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     updateCurrentWorkspaceItems(updatedNodes);
   };
 
-  // When user deletes one or more nodes
+  // Delete nodes
   const onNodesDelete = useCallback(
       (deletedNodes) => {
         setNodes((prevNodes) => {
           const updatedNodes = prevNodes.filter(
-              (node) => !deletedNodes.find((deleted) => deleted.id === node.id)
+              (node) => !deletedNodes.find((del) => del.id === node.id)
           );
-          updateCurrentWorkspaceItems(updatedNodes); // Sync with local storage
+          updateCurrentWorkspaceItems(updatedNodes);
           return updatedNodes;
         });
 
-        // Remove edges linked to deleted nodes
         setEdges((prevEdges) =>
             prevEdges.filter(
                 (edge) =>
@@ -128,7 +127,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
       [updateCurrentWorkspaceItems]
   );
 
-  // Helper function that returns the complete workflow
+  // Return the entire workflow for exporting
   const getWorkflowData = () => ({
     nodes: nodes.map((node) => ({
       id: node.id,
@@ -142,7 +141,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     })),
   });
 
-  // Provide the getWorkflowData function to the parent (so it can do export, etc.)
+  // Provide getWorkflowData to parent
   useEffect(() => {
     if (onSetWorkflowData) {
       onSetWorkflowData(() => getWorkflowData);
