@@ -13,6 +13,11 @@ function WorkflowMenu() {
     'Preprocessing',
     'Normalization',
     'Feature Extraction',
+    'Fnirt',
+    'Flirt',
+    '3D-Deconvolution',
+    '3D-Merge',
+    '3D-Shift'
   ];
 
   const handleDragStart = (event, name) => {
