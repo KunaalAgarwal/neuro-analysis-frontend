@@ -19,8 +19,20 @@
     padding: 0;
 }
 
-.info-icon {
-    margin-left: 10px; /* Space between title and icon */
+.header-span {
+    font-weight: 500;
+    margin-left: 10px;
     cursor: pointer;
     font-size: clamp(0.25rem, 1.5vw, 1.5rem); /* Responsive icon size */
 }
+
+.header-span:hover {
+    font-weight: 800;
+    transform: scale(1.05);
+}
+
+.header-link {
+    text-decoration: none;
+    color: inherit;
+}
+
