@@ -31,21 +31,27 @@ h3 {
 }
 
 .app-layout {
-  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden; 
+  overflow: auto;
 }
 
 .workflow-content {
-    position: relative;
-    display: flex;
-    /*flex-direction: column;*/
-    height: 100%;
-    overflow: auto;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 20px;
 }
 
+.workflow-content-main {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  /*align-items: center;*/
+}
 
 /*floating is utility, can use if needed */
 .floating-container {

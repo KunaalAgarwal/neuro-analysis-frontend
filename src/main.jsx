@@ -39,12 +39,14 @@ function App() {
                     onGenerateWorkflow={() => generateWorkflow(getWorkflowData)}
                 />
                 <div className="workflow-content">
-                    <WorkflowMenu />
-                    <WorkflowCanvas
-                        workflowItems={workspaces[currentWorkspace]}
-                        updateCurrentWorkspaceItems={updateCurrentWorkspaceItems}
-                        onSetWorkflowData={setGetWorkflowData}
-                    />
+                    <div className="workflow-content-main">
+                        <WorkflowMenu />
+                        <WorkflowCanvas
+                            workflowItems={workspaces[currentWorkspace]}
+                            updateCurrentWorkspaceItems={updateCurrentWorkspaceItems}
+                            onSetWorkflowData={setGetWorkflowData}
+                        />
+                    </div>
                     <ToggleWorkflowBar
                         current={currentWorkspace}
                         workspaces={workspaces}

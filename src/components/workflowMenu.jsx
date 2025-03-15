@@ -36,7 +36,7 @@ function WorkflowMenu() {
           />
         ))}
       </div>
-    </div>  
+    </div>
   );
 }
 

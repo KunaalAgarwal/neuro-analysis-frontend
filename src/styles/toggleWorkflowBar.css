@@ -1,10 +1,8 @@
 .toggle-workflow-bar {
   display: flex;
-  position: absolute;
-  bottom: clamp(4.0vh, 5.0vh, 6.0vh);
-  left: 50%;
-  transform: translateX(-50%);
+  margin: 10px auto 0 auto;
   width: clamp(300px, 60%, 800px);
+
   justify-content: space-between;
   align-items: center;
   padding: 10px;
