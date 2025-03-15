@@ -5,8 +5,9 @@ import '../styles/workflowItem.css';
 
 const NodeComponent = ({ data }) => {
     const defaultJson = `{
-   "parameter_1": false, 
-   "parameter_2": 100
+    parameter_1: false, 
+    parameter_2: 100,
+    parameter_3: 'multi-layer'
 }`;
 
     const [showModal, setShowModal] = useState(false);
@@ -61,7 +62,7 @@ const NodeComponent = ({ data }) => {
                             <Form.Label className='modal-label'>Input parameters as a JSON Object.</Form.Label>
                             <Form.Control
                                 as="textarea"
-                                rows={3}
+                                rows={5}
                                 value={textInput}
                                 onChange={handleInputChange}
                                 onKeyDown={handleKeyDown} // Enables tab support (3 spaces)
