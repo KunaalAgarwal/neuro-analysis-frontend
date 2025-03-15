@@ -14,10 +14,19 @@ const NodeComponent = ({ data }) => {
     const [textInput, setTextInput] = useState(data.parameters || '');
 
     const handleOpenModal = () => {
-        // If the text input is blank, replace with default JSON
-        if (!textInput.trim()) {
-            setTextInput(defaultJson);
+        let inputValue = textInput;
+
+        // Ensure inputValue is always a string before calling trim()
+        if (typeof inputValue !== 'string') {
+            inputValue = JSON.stringify(inputValue, null, 2); // Convert object to formatted JSON string
         }
+
+        if (!inputValue.trim()) {
+            setTextInput(defaultJson);
+        } else {
+            setTextInput(inputValue);
+        }
+
         setShowModal(true);
     };
 
@@ -29,7 +38,7 @@ const NodeComponent = ({ data }) => {
             try {
                 data.onSaveParameters(JSON.parse(textInput));
             } catch (err) {
-                alert('Invalid JSON entered. Storing raw text instead.');
+                alert('Invalid JSON entered. Defaulting to raw text storage. Please ensure entry is formatted appropriately.');
                 data.onSaveParameters(textInput);
             }
         }
