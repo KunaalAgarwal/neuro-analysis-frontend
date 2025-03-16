@@ -15,12 +15,12 @@ import '../styles/actionsBar.css';
 
 import NodeComponent from './NodeComponent';
 
-// Define node types outside the component
+// Define node types outside the component.
 const nodeTypes = {
   default: NodeComponent
 };
 
-// Define edge types outside the component to prevent re-renders
+// Define edge types outside the component to prevent re-renders.
 const edgeTypes = {};
 
 function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkflowData }) {
@@ -29,24 +29,38 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
-  // Initialize local nodes from workflowItems
-  useEffect(() => {
-    const initialNodes = workflowItems.map((item, idx) => ({
-      id: `${idx}`,
-      type: 'default',
-      data: {
-        label: item.data.label,
-        parameters: item.data.parameters || '',
-        onSaveParameters: (newParams) => handleNodeUpdate(`${idx}`, newParams),
-      },
-      position: item.position || { x: 100 + idx * 50, y: 100 },
-    }));
+  // Use a ref to detect when the workspace (i.e. workflowItems) changes,
+  // so we only initialize local state when switching workspaces.
+  const prevWorkflowItemsRef = useRef();
 
-    setNodes(initialNodes);
-    setEdges([]);
+  // Initialize local nodes and edges when the workspace changes.
+  useEffect(() => {
+    if (prevWorkflowItemsRef.current !== workflowItems) {
+      const initialNodes = (workflowItems.nodes || []).map((item, idx) => ({
+        id: `${idx}`,
+        type: 'default',
+        data: {
+          label: item.label,
+          parameters: item.parameters || '',
+          onSaveParameters: (newParams) => handleNodeUpdate(`${idx}`, newParams),
+        },
+        position: item.position || { x: 100 + idx * 50, y: 100 },
+      }));
+      const initialEdges = workflowItems.edges || [];
+      setNodes(initialNodes);
+      setEdges(initialEdges);
+      prevWorkflowItemsRef.current = workflowItems;
+    }
   }, [workflowItems]);
 
-  // Update a node’s parameters in local state and localStorage
+  // Helper to update the parent workspace state.
+  const updateWorkspaceState = (updatedNodes, updatedEdges) => {
+    if (updateCurrentWorkspaceItems) {
+      updateCurrentWorkspaceItems({ nodes: updatedNodes, edges: updatedEdges });
+    }
+  };
+
+  // Update a node’s parameters in local state.
   const handleNodeUpdate = (nodeId, updatedParameters) => {
     setNodes((prevNodes) => {
       const updatedNodes = prevNodes.map((node) =>
@@ -54,32 +68,33 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
               ? { ...node, data: { ...node.data, parameters: updatedParameters } }
               : node
       );
-
-      updateCurrentWorkspaceItems(updatedNodes);
+      updateWorkspaceState(updatedNodes, edges);
       return updatedNodes;
     });
   };
 
-  // Connect edges
+  // Connect edges.
   const onConnect = useCallback((connection) => {
-    setEdges((eds) =>
-        addEdge(
-            {
-              ...connection,
-              animated: true,
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-                width: 10,
-                height: 10,
-              },
-              style: { strokeWidth: 2 },
+    setEdges((eds) => {
+      const newEdges = addEdge(
+          {
+            ...connection,
+            animated: true,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 10,
+              height: 10,
             },
-            eds
-        )
-    );
-  }, []);
+            style: { strokeWidth: 2 },
+          },
+          eds
+      );
+      updateWorkspaceState(nodes, newEdges);
+      return newEdges;
+    });
+  }, [nodes, edges, updateCurrentWorkspaceItems]);
 
-  // Drag-and-drop new nodes
+  // Drag-and-drop new nodes.
   const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -109,33 +124,35 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
 
     const updatedNodes = [...nodes, newNode];
     setNodes(updatedNodes);
-    updateCurrentWorkspaceItems(updatedNodes);
+    updateWorkspaceState(updatedNodes, edges);
   };
 
-  // Delete nodes
+  // Delete nodes and corresponding edges.
   const onNodesDelete = useCallback(
       (deletedNodes) => {
         setNodes((prevNodes) => {
           const updatedNodes = prevNodes.filter(
               (node) => !deletedNodes.find((del) => del.id === node.id)
           );
-          updateCurrentWorkspaceItems(updatedNodes);
+          updateWorkspaceState(updatedNodes, edges);
           return updatedNodes;
         });
 
-        setEdges((prevEdges) =>
-            prevEdges.filter(
-                (edge) =>
-                    !deletedNodes.some(
-                        (node) => edge.source === node.id || edge.target === node.id
-                    )
-            )
-        );
+        setEdges((prevEdges) => {
+          const updatedEdges = prevEdges.filter(
+              (edge) =>
+                  !deletedNodes.some(
+                      (node) => edge.source === node.id || edge.target === node.id
+                  )
+          );
+          updateWorkspaceState(nodes, updatedEdges);
+          return updatedEdges;
+        });
       },
-      [updateCurrentWorkspaceItems]
+      [nodes, edges, updateCurrentWorkspaceItems]
   );
 
-  // Return the entire workflow for exporting
+  // Return the entire workflow for exporting.
   const getWorkflowData = () => ({
     nodes: nodes.map((node) => ({
       id: node.id,
@@ -149,7 +166,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     })),
   });
 
-  // Provide getWorkflowData to parent
+  // Provide getWorkflowData to parent.
   useEffect(() => {
     if (onSetWorkflowData) {
       onSetWorkflowData(() => getWorkflowData);
@@ -173,7 +190,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
               onNodesDelete={onNodesDelete}
               fitView
               nodeTypes={nodeTypes}
-              edgeTypes={edgeTypes} // Fix applied here
+              edgeTypes={edgeTypes}
               onInit={(instance) => setReactFlowInstance(instance)}
           >
             <MiniMap />
