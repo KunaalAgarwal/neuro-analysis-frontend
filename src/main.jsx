@@ -4,7 +4,8 @@ import ActionsBar from './components/actionsBar';
 import HeaderBar from './components/headerBar';
 import WorkflowMenu from './components/workflowMenu';
 import ToggleWorkflowBar from './components/toggleWorkflowBar';
-import WorkflowCanvas from './components/workflowCanvas';
+import WorkflowCanvas from './components/workflowCanvas'
+import Footer from "./components/footer";
 import { useWorkspaces } from './hooks/useWorkspaces';
 import { useGenerateWorkflow } from './hooks/generateWorkflow';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -53,6 +54,7 @@ function App() {
                         onChange={setCurrentWorkspace}
                     />
                 </div>
+                <Footer />
             </div>
         </div>
     );

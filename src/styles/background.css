@@ -35,6 +35,7 @@ h3 {
   flex-direction: column;
   height: 100vh;
   overflow: auto;
+  scroll-behavior: smooth;
 }
 
 .workflow-content {
@@ -42,7 +43,6 @@ h3 {
   flex: 1;
   flex-direction: column;
   height: 100%;
-  overflow: auto;
   padding-bottom: 20px;
 }
 
@@ -50,7 +50,6 @@ h3 {
   display: flex;
   flex: 1;
   flex-direction: row;
-  /*align-items: center;*/
 }
 
 /*floating is utility, can use if needed */
