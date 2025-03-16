@@ -38,20 +38,21 @@ function App() {
                     // On click, we pass our function to generateWorkflow
                     onGenerateWorkflow={() => generateWorkflow(getWorkflowData)}
                 />
-                <div className="d-flex">
-                    <WorkflowMenu />
-                    <WorkflowCanvas
-                        workflowItems={workspaces[currentWorkspace]}
-                        updateCurrentWorkspaceItems={updateCurrentWorkspaceItems}
-                        // This function pointer will be updated from WorkflowCanvas
-                        onSetWorkflowData={setGetWorkflowData}
+                <div className="workflow-content">
+                    <div className="workflow-content-main">
+                        <WorkflowMenu />
+                        <WorkflowCanvas
+                            workflowItems={workspaces[currentWorkspace]}
+                            updateCurrentWorkspaceItems={updateCurrentWorkspaceItems}
+                            onSetWorkflowData={setGetWorkflowData}
+                        />
+                    </div>
+                    <ToggleWorkflowBar
+                        current={currentWorkspace}
+                        workspaces={workspaces}
+                        onChange={setCurrentWorkspace}
                     />
                 </div>
-                <ToggleWorkflowBar
-                    current={currentWorkspace}
-                    workspaces={workspaces}
-                    onChange={setCurrentWorkspace}
-                />
             </div>
         </div>
     );

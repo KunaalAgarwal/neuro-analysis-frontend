@@ -1,0 +1,6 @@
+Add footer
+
+Add buttons to the headerbar (similar to MedicaidJS) include github link the information link etc.
+
+Watch out for the error in editing parameters.
+

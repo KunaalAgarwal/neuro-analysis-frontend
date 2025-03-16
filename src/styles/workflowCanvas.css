@@ -1,55 +1,9 @@
 .workflow-canvas {
-  position: relative;
-  overflow-y: auto;
+  height: 100%;
   width: 100%;
-  flex-grow: 1;
-  margin: 20px;
-  margin-bottom: 150px; 
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column; 
-  align-items: flex-start;
-  justify-content: flex-start;
-  min-height: clamp(400px, 60vh, 800px); 
-  max-height: 80vh;
-  color: white;
-  font-family: 'Inter', sans-serif;
-  transition: background-color 0.2s ease;
-  pointer-events: all;
 }
 
-.workflow-canvas.is-over {
-  background-color: rgba(240, 240, 240, 0.9);
-  color: black;
-}
-
-/* Target default ReactFlow nodes */
-.custom-node {
-  background-color: #9c169c !important; /* Ensure this color applies */
-  color: #000000 !important;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  min-width: 120px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.react-flow__node-default:hover {
-  background-color: #f0f0f0 !important;
-  transform: scale(1.05); /* Slight zoom on hover */
-}
-
-/* Adjust labels to ensure they display correctly */
-.react-flow__node-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.workflow-canvas-container {
+  height: 100%;
+  width: 99%;
 }
