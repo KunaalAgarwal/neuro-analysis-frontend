@@ -5,7 +5,8 @@ import ReactFlow, {
   Controls,
   MiniMap,
   useNodesState,
-  useEdgesState
+  useEdgesState,
+  MarkerType
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
@@ -14,9 +15,13 @@ import '../styles/actionsBar.css';
 
 import NodeComponent from './NodeComponent';
 
+// Define node types outside the component
 const nodeTypes = {
   default: NodeComponent
 };
+
+// Define edge types outside the component to prevent re-renders
+const edgeTypes = {};
 
 function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkflowData }) {
   const reactFlowWrapper = useRef(null);
@@ -32,7 +37,6 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
       data: {
         label: item.data.label,
         parameters: item.data.parameters || '',
-        // A callback that NodeComponent will call on close
         onSaveParameters: (newParams) => handleNodeUpdate(`${idx}`, newParams),
       },
       position: item.position || { x: 100 + idx * 50, y: 100 },
@@ -51,7 +55,6 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
               : node
       );
 
-      // Persist to local storage via the custom hook
       updateCurrentWorkspaceItems(updatedNodes);
       return updatedNodes;
     });
@@ -63,7 +66,12 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
         addEdge(
             {
               ...connection,
-              markerEnd: { type: 'arrowclosed', width: 10, height: 10 },
+              animated: true,
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 10,
+                height: 10,
+              },
               style: { strokeWidth: 2 },
             },
             eds
@@ -165,6 +173,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
               onNodesDelete={onNodesDelete}
               fitView
               nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes} // Fix applied here
               onInit={(instance) => setReactFlowInstance(instance)}
           >
             <MiniMap />
