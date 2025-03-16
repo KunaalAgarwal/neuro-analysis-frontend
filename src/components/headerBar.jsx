@@ -22,8 +22,8 @@ function HeaderBar(){
                         <li><strong>Edit Parameters:</strong> Double-click a node to modify its parameters. Click outside the popup to exit.</li>
                         <li><strong>Connect Nodes:</strong> Draw connections between nodes within the canvas to define the workflow structure.</li>
                         <li><strong>Delete Elements:</strong> Click a node or edge and press Backspace to remove it.</li>
-                        <li><strong>Manage Workspaces:</strong> Organize workflows using multiple workspaces, which are saved persistently in your browser.</li>
-                        <li><strong>Generate Workflow:</strong> Produce a workflow zip file containing the CWL workflow and the CWL Dependencies.</li>
+                        <li><strong>Manage Workspaces:</strong> Organize workflows using multiple workspaces, which are saved using persistent in-browser databases.</li>
+                        <li><strong>Generate Workflow:</strong> Produce a workflow zip file containing the CWL workflow and the CWL Tool dependencies.</li>
                     </ul>
                 </Modal.Body>
             </Modal>
