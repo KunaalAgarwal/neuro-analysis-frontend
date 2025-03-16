@@ -3,5 +3,5 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
     plugins: [react()],
-    base: "/neuro-analysis-frontend/", // Change to match your repo name
+    // base: "/neuro-analysis-frontend/", // Change to match your repo name
 });
