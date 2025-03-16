@@ -25,35 +25,38 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const prevWorkflowItemsRef = useRef();
 
-  // When the workspace changes, initialize local state from the stored workspace.
+  // --- INITIALIZATION & Synchronization ---
+  // This effect watches for changes in the persistent workspace.
+  // When the clear workspace button is pressed, workflowItems becomes empty,
+  // and this effect clears the canvas accordingly.
   useEffect(() => {
-    if (prevWorkflowItemsRef.current !== workflowItems) {
-      // Assume workflowItems is an object: { nodes: [...], edges: [...] }
-      const initialNodes = (workflowItems.nodes || []).map((node) => ({
-        ...node,
-        // Reattach the onSaveParameters callback without modifying the label.
-        data: {
-          ...node.data,
-          onSaveParameters: (newParams) => handleNodeUpdate(node.id, newParams)
-        }
-      }));
-      const initialEdges = workflowItems.edges || [];
-      setNodes(initialNodes);
-      setEdges(initialEdges);
-      prevWorkflowItemsRef.current = workflowItems;
+    if (workflowItems && typeof workflowItems.nodes !== 'undefined') {
+      // Only update if the count of nodes in the persistent workspace differs from our local state.
+      if (workflowItems.nodes.length !== nodes.length) {
+        const initialNodes = (workflowItems.nodes || []).map((node) => ({
+          ...node,
+          data: {
+            ...node.data,
+            // Reattach the callback so the node remains interactive.
+            onSaveParameters: (newParams) => handleNodeUpdate(node.id, newParams)
+          }
+        }));
+        const initialEdges = workflowItems.edges || [];
+        setNodes(initialNodes);
+        setEdges(initialEdges);
+      }
     }
-  }, [workflowItems]);
+  }, [workflowItems, nodes.length]);
 
-  // Helper: update the persistent workspace (nodes & edges) on explicit interactions.
+  // Helper: Update persistent workspace state.
   const updateWorkspaceState = (updatedNodes, updatedEdges) => {
     if (updateCurrentWorkspaceItems) {
       updateCurrentWorkspaceItems({ nodes: updatedNodes, edges: updatedEdges });
     }
   };
 
-  // Update a node’s parameters in local state.
+  // Update a node’s parameters.
   const handleNodeUpdate = (nodeId, updatedParameters) => {
     setNodes((prevNodes) => {
       const updatedNodes = prevNodes.map((node) =>
@@ -66,34 +69,37 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     });
   };
 
-  // Create a new edge and update workspace state.
-  const onConnect = useCallback((connection) => {
-    setEdges((eds) => {
-      const newEdges = addEdge(
-          {
-            ...connection,
-            animated: true,
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              width: 10,
-              height: 10,
-            },
-            style: { strokeWidth: 2 },
-          },
-          eds
-      );
-      updateWorkspaceState(nodes, newEdges);
-      return newEdges;
-    });
-  }, [nodes, edges, updateCurrentWorkspaceItems]);
+  // Connect edges.
+  const onConnect = useCallback(
+      (connection) => {
+        setEdges((eds) => {
+          const newEdges = addEdge(
+              {
+                ...connection,
+                animated: true,
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                  width: 10,
+                  height: 10,
+                },
+                style: { strokeWidth: 2 },
+              },
+              eds
+          );
+          updateWorkspaceState(nodes, newEdges);
+          return newEdges;
+        });
+      },
+      [nodes, edges, updateCurrentWorkspaceItems]
+  );
 
-  // Handle drag-over.
+  // Handle drag over.
   const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   };
 
-  // On drop, create a new node using the label from the dragged item.
+  // On drop, create a new node.
   const handleDrop = (event) => {
     event.preventDefault();
     const name = event.dataTransfer.getData('node/name') || 'Unnamed Node';
@@ -120,32 +126,50 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     updateWorkspaceState(updatedNodes, edges);
   };
 
-  // On node deletion, remove nodes (and related edges) then update workspace.
+  // Delete nodes and corresponding edges.
   const onNodesDelete = useCallback(
       (deletedNodes) => {
+        // Remove deleted nodes from the nodes state.
         setNodes((prevNodes) => {
           const updatedNodes = prevNodes.filter(
-              (node) => !deletedNodes.find((del) => del.id === node.id)
+              (node) => !deletedNodes.some((del) => del.id === node.id)
           );
-          updateWorkspaceState(updatedNodes, edges);
+          // Update edges using the updated nodes.
+          setEdges((prevEdges) => {
+            const updatedEdges = prevEdges.filter(
+                (edge) =>
+                    !deletedNodes.some(
+                        (node) => edge.source === node.id || edge.target === node.id
+                    )
+            );
+            // Update persistent workspace with both new nodes and edges.
+            updateWorkspaceState(updatedNodes, updatedEdges);
+            return updatedEdges;
+          });
           return updatedNodes;
         });
-
-        setEdges((prevEdges) => {
-          const updatedEdges = prevEdges.filter(
-              (edge) =>
-                  !deletedNodes.some(
-                      (node) => edge.source === node.id || edge.target === node.id
-                  )
-          );
-          updateWorkspaceState(nodes, updatedEdges);
-          return updatedEdges;
-        });
       },
-      [nodes, edges, updateCurrentWorkspaceItems]
+      [updateCurrentWorkspaceItems]
   );
 
-  // Provide complete workflow data (nodes & edges) for exporting.
+  // --- Global Key Listener for "Delete" Key ---
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Delete') {
+        if (reactFlowInstance) {
+          const selectedNodes = reactFlowInstance.getNodes().filter((node) => node.selected);
+          if (selectedNodes.length > 0) {
+            onNodesDelete(selectedNodes);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [reactFlowInstance, onNodesDelete]);
+
+  // Provide complete workflow data for exporting.
   const getWorkflowData = () => ({
     nodes: nodes.map((node) => ({
       id: node.id,

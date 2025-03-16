@@ -18,7 +18,7 @@
     align-items: flex-start; /* Align items to the left */
 }
 .footer-logo {
-    width: clamp(150px, 250px, 350px);
+    width: clamp(100px, 250px, 350px);
     height: auto;
     margin-bottom: 7px;
 
