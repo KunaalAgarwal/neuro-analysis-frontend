@@ -15,12 +15,9 @@ import '../styles/actionsBar.css';
 
 import NodeComponent from './NodeComponent';
 
-// Define node types outside the component.
-const nodeTypes = {
-  default: NodeComponent
-};
-
-// Define edge types outside the component to prevent re-renders.
+// Define node types.
+const nodeTypes = { default: NodeComponent };
+// Define edge types.
 const edgeTypes = {};
 
 function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkflowData }) {
@@ -28,23 +25,19 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-
-  // Use a ref to detect when the workspace (i.e. workflowItems) changes,
-  // so we only initialize local state when switching workspaces.
   const prevWorkflowItemsRef = useRef();
 
-  // Initialize local nodes and edges when the workspace changes.
+  // When the workspace changes, initialize local state from the stored workspace.
   useEffect(() => {
     if (prevWorkflowItemsRef.current !== workflowItems) {
-      const initialNodes = (workflowItems.nodes || []).map((item, idx) => ({
-        id: `${idx}`,
-        type: 'default',
+      // Assume workflowItems is an object: { nodes: [...], edges: [...] }
+      const initialNodes = (workflowItems.nodes || []).map((node) => ({
+        ...node,
+        // Reattach the onSaveParameters callback without modifying the label.
         data: {
-          label: item.label,
-          parameters: item.parameters || '',
-          onSaveParameters: (newParams) => handleNodeUpdate(`${idx}`, newParams),
-        },
-        position: item.position || { x: 100 + idx * 50, y: 100 },
+          ...node.data,
+          onSaveParameters: (newParams) => handleNodeUpdate(node.id, newParams)
+        }
       }));
       const initialEdges = workflowItems.edges || [];
       setNodes(initialNodes);
@@ -53,7 +46,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     }
   }, [workflowItems]);
 
-  // Helper to update the parent workspace state.
+  // Helper: update the persistent workspace (nodes & edges) on explicit interactions.
   const updateWorkspaceState = (updatedNodes, updatedEdges) => {
     if (updateCurrentWorkspaceItems) {
       updateCurrentWorkspaceItems({ nodes: updatedNodes, edges: updatedEdges });
@@ -73,7 +66,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     });
   };
 
-  // Connect edges.
+  // Create a new edge and update workspace state.
   const onConnect = useCallback((connection) => {
     setEdges((eds) => {
       const newEdges = addEdge(
@@ -94,12 +87,13 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     });
   }, [nodes, edges, updateCurrentWorkspaceItems]);
 
-  // Drag-and-drop new nodes.
+  // Handle drag-over.
   const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   };
 
+  // On drop, create a new node using the label from the dragged item.
   const handleDrop = (event) => {
     event.preventDefault();
     const name = event.dataTransfer.getData('node/name') || 'Unnamed Node';
@@ -111,13 +105,12 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     });
 
     const newNode = {
-      id: `${nodes.length}`,
+      id: `${Date.now()}`, // unique id
       type: 'default',
       data: {
         label: name,
         parameters: '',
-        onSaveParameters: (newParams) =>
-            handleNodeUpdate(`${nodes.length}`, newParams),
+        onSaveParameters: (newParams) => handleNodeUpdate(newNode.id, newParams),
       },
       position: flowPosition,
     };
@@ -127,7 +120,7 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     updateWorkspaceState(updatedNodes, edges);
   };
 
-  // Delete nodes and corresponding edges.
+  // On node deletion, remove nodes (and related edges) then update workspace.
   const onNodesDelete = useCallback(
       (deletedNodes) => {
         setNodes((prevNodes) => {
@@ -152,12 +145,11 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
       [nodes, edges, updateCurrentWorkspaceItems]
   );
 
-  // Return the entire workflow for exporting.
+  // Provide complete workflow data (nodes & edges) for exporting.
   const getWorkflowData = () => ({
     nodes: nodes.map((node) => ({
       id: node.id,
-      label: node.data.label,
-      parameters: node.data.parameters,
+      data: node.data,
       position: node.position,
     })),
     edges: edges.map((edge) => ({
@@ -166,7 +158,6 @@ function WorkflowCanvas({ workflowItems, updateCurrentWorkspaceItems, onSetWorkf
     })),
   });
 
-  // Provide getWorkflowData to parent.
   useEffect(() => {
     if (onSetWorkflowData) {
       onSetWorkflowData(() => getWorkflowData);
