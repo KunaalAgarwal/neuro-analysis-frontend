@@ -5,7 +5,7 @@ const Footer = () => {
     return (
         <footer className="footer">
             <div className="footer-content">
-                <img src="../images/SDS Monogram Logo Color-Screen.png" alt="SDS Logo" className="footer-logo" />
+                <img src={`${import.meta.env.BASE_URL}images/SDS Monogram Logo Color-Screen.png`} alt="SDS Logo" className="footer-logo" />
                 <span className="footer-span">
                     [Authors = Agarwal K.
                     <a href="https://www.linkedin.com/in/kunaal-agarwal/" target="_blank" rel="noopener noreferrer" className="footer-links footer-span"> [Info]</a>,
