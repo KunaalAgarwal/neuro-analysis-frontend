@@ -1,24 +1,44 @@
 # Neuro-imaging Analysis Workflow Generator
-To streamline the process of creating fMRI (etc.) image analysis workflows we've created the following graphical user interface (GUI). 
-Users can create workflows in the GUI using common analysis operations from FSL, AFNI, and SPM. Once, the workflow has created the user can directly generate a 
-zip file containing the Common Workflow Language ([CWL](https://www.commonwl.org/user_guide/introduction/index.html)) workflow along with the CWL tool dependencies.
+
+To streamline the process of creating fMRI and other neuro-imaging analysis workflows, we've developed this graphical user interface (GUI). Users can design workflows by selecting common analysis operations from FSL, AFNI, and SPM. Once the workflow is configured, you can directly generate a zip file containing the [Common Workflow Language (CWL)](https://www.commonwl.org/user_guide/introduction/index.html) workflow along with its tool dependencies.
 
 ### [Deployment](https://kunaalagarwal.github.io/neuro-analysis-frontend/)
 
 ### Running Locally
-``git clone 'https://github.com/KunaalAgarwal/neuro-analysis-frontend.git'``
 
-``npm install``
+Clone the repository, install the dependencies, and start the development server:
 
-``npm run dev``
+```bash
+git clone https://github.com/KunaalAgarwal/neuro-analysis-frontend.git
+cd neuro-analysis-frontend
+npm install
+npm run dev
+```
 
 ### Contributions
 
-While contributing to this repository be sure to use a development branch and merge that branch once your changes are stable in the dev environment.
-``git branch <branch_name>`` ``git checkout <branch_name>`` ``git checkout main`` ``git merge -m 'commit message' <branch_name>``
+When contributing, please follow these best practices:
 
-This is crucial as GitHub Actions has been configured to automatically deploy the repository to GitHub pages upon all pushed commits to the main branch. 
+- **Use Development Branches:**  
+  Create a new branch for each feature or bug fix. This allows you to test changes locally without triggering an automatic deployment.
 
-### Authorship 
+  ```bash
+  git checkout -b <branch_name>
+  ```
 
-This project was created by Kunaal Agarwal and advised by Javier Rasero, PhD, under the funding of the University of Virginia Harrison Research Award. 
+- **Merging to Main:**  
+  Once your changes have been tested and are stable in the development environment, merge them into the `main` branch.  
+  **Important:** The repository is configured with GitHub Actions to automatically deploy to GitHub Pages on every push to the `main` branch.
+  ```bash
+  git checkout main
+  git merge <branch_name> -m "Merge <branch_name>: commit message"
+  git push origin main
+  ```
+
+### Deployment Workflow
+
+Our deployment process uses GitHub Actions to automatically build and deploy the project whenever changes are pushed to the `main` branch. This ensures that the live site on GitHub Pages is always up-to-date with the latest stable code.
+
+### Authorship
+
+This project was created by Kunaal Agarwal and advised by Javier Rasero, PhD, under the funding of the University of Virginia Harrison Research Award.
