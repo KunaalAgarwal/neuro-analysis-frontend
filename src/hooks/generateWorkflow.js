@@ -1,32 +1,33 @@
-const tool_map = {
-    'Brain Extraction': '../../cwl/fsl/bet.cwl'
-}
-
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { buildCWLWorkflow } from './buildWorkflow.js';
+import { TOOL_MAP } from '../../cwl/toolMap.js';
 
 export function useGenerateWorkflow() {
-    const generateWorkflow = (getWorkflowData) => {
-        if (typeof getWorkflowData !== 'function') {
-            console.error('Error: getWorkflowData is not a function');
-            return;
+    const generateWorkflow = async (getWorkflowData) => {
+        const graph = getWorkflowData();
+        if (!graph) return alert('No workflow data.');
+
+        // 1 build workflow YAML
+        const mainCWL = buildCWLWorkflow(graph);
+
+        // 2 collect unique tool paths
+        const toolPaths = [...new Set(
+            graph.nodes.map(n => TOOL_MAP[n.data.label]?.cwlPath)
+        )];
+
+        // 3 build zip
+        const zip = new JSZip();
+        zip.file('workflows/main.cwl', mainCWL);
+
+        for (const p of toolPaths) {
+            // fetch tool text via Vite's dev server or GH Pages
+            const txt = await fetch(`/${p}`).then(r => r.text());
+            zip.file(p, txt);                    // keep folder hierarchy
         }
 
-        const workflowData = getWorkflowData();
-        if (!workflowData) {
-            console.error('Error: No workflow data available');
-            return;
-        }
-
-        // Convert to JSON (or a text format of your choice)
-        const fileContent = JSON.stringify(workflowData, null, 2);
-
-        // Download the file
-        const blob = new Blob([fileContent], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'workflow.txt';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const blob = await zip.generateAsync({ type: 'blob' });
+        saveAs(blob, 'workflow_bundle.zip');
     };
 
     return { generateWorkflow };
