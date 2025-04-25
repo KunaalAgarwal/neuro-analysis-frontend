@@ -1,3 +1,8 @@
+const tool_map = {
+    'Brain Extraction': '../../cwl/fsl/bet.cwl'
+}
+
+
 export function useGenerateWorkflow() {
     const generateWorkflow = (getWorkflowData) => {
         if (typeof getWorkflowData !== 'function') {
