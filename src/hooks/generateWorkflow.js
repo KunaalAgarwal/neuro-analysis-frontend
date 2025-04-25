@@ -4,28 +4,56 @@ import { buildCWLWorkflow } from './buildWorkflow.js';
 import { TOOL_MAP } from '../../cwl/toolMap.js';
 
 export function useGenerateWorkflow() {
+    /**
+     * Builds main.cwl, pulls tool CWL files, zips, and downloads.
+     * Works both in `npm run dev` (BASE_URL = "/") and on GitHub Pages
+     * (BASE_URL = "/neuro-analysis-frontend/").
+     */
     const generateWorkflow = async (getWorkflowData) => {
+        if (typeof getWorkflowData !== 'function') {
+            console.error('generateWorkflow expects a function');
+            return;
+        }
+
         const graph = getWorkflowData();
-        if (!graph) return alert('No workflow data.');
+        if (!graph) {
+            alert('Empty workflow — nothing to export.');
+            return;
+        }
 
-        // 1 build workflow YAML
-        const mainCWL = buildCWLWorkflow(graph);
+        /* ---------- build CWL workflow ---------- */
+        let mainCWL;
+        try {
+            mainCWL = buildCWLWorkflow(graph);
+        } catch (err) {
+            alert(`Workflow build failed:\n${err.message}`);
+            return;
+        }
 
-        // 2 collect unique tool paths
-        const toolPaths = [...new Set(
-            graph.nodes.map(n => TOOL_MAP[n.data.label]?.cwlPath)
-        )];
-
-        // 3 build zip
+        /* ---------- prepare ZIP ---------- */
         const zip = new JSZip();
         zip.file('workflows/main.cwl', mainCWL);
 
-        for (const p of toolPaths) {
-            // fetch tool text via Vite's dev server or GH Pages
-            const txt = await fetch(`/${p}`).then(r => r.text());
-            zip.file(p, txt);                    // keep folder hierarchy
+        /* ---------- fetch each unique tool file ---------- */
+        const uniquePaths = [
+            ...new Set(graph.nodes.map(n => TOOL_MAP[n.data.label].cwlPath))
+        ];
+
+        // baseURL ends in "/", ensure single slash join
+        const base = (import.meta.env.BASE_URL || '/').replace(/\/?$/, '/');
+
+        try {
+            for (const p of uniquePaths) {
+                const res = await fetch(`${base}${p}`);
+                if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+                zip.file(p, await res.text());
+            }
+        } catch (err) {
+            alert(`Unable to fetch tool file:\n${err.message}`);
+            return;
         }
 
+        /* ---------- download ---------- */
         const blob = await zip.generateAsync({ type: 'blob' });
         saveAs(blob, 'workflow_bundle.zip');
     };
