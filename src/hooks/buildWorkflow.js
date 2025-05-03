@@ -71,14 +71,6 @@ export function buildCWLWorkflow(graph) {
             }
         }
 
-        // enforce required BET keys (adjust if you add more tools/requirements)
-        if (tool.id === 'bet') {
-            ['input_file', 'output_prefix'].forEach(k => {
-                if (!(k in paramObj)) {
-                    throw new Error(`BET node ${nodeId} missing required "${k}"`);
-                }
-            });
-        }
 
         Object.entries(paramObj).forEach(([k, v]) => {
             // expose at runtime
