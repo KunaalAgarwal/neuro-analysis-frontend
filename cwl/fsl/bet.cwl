@@ -1,60 +1,144 @@
+#!/usr/bin/env cwl-runner
+
+# https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/BET(2f)UserGuide.html
+
 cwlVersion: v1.2
 class: CommandLineTool
-label: Brain Extraction (FSL BET)
-doc: |
-  Wrapper for FSL's BET (Brain Extraction Tool).
-  Version pinned to FSL 7.1.1 for reproducibility.
-baseCommand: bet
+baseCommand: 'bet'
+
 hints:
   DockerRequirement:
-    dockerPull: brainlife/fsl:7.1.1
+    dockerPull: brainlife/fsl:latest
+
+stdout: $(inputs.output).log
+stderr: $(inputs.output).log
+
 inputs:
-  input_file:
+  input: 
     type: File
     label: Input T1-weighted image
     inputBinding:
       position: 1
-  output_prefix:
+  output:
     type: string
-    label: Output file prefix (no extension)
+    label: Output filename
     inputBinding:
       position: 2
 
-  # ---------- optional CLI flags ----------
-  frac:
+  # OPTIONAL PARAMETERS
+  overlay: # if set, will generate an outline of the original image on the extracted brain
+    type: ['null', boolean]
+    label: Generate brain outline image
+    inputBinding: {prefix: -o, position: 3}
+  mask: # if set, will generate a binary mask image
+    type: ['null', boolean]
+    label: Generate binary brain mask image
+    inputBinding: {prefix: -m, position: 4}
+  skull: # if set, will generate a skull-stripped image
+    type: ['null', boolean]
+    label: Generate skull-stripped image
+    inputBinding: {prefix: -s, position: 5}
+  ngenerate: # if set, will NOT generate the default extracted output
+    type: ['null', boolean]
+    label: Do not generate the default output
+    inputBinding: {prefix: -n, position: 6}
+  frac: # bound from 0 to 1
     type: ['null', double]
-    label: Fractional intensity threshold (-f)
-    inputBinding:
-      position: 3
-      prefix: -f
-      separate: true
-    default: 0.50        # BET default
-  mask:
+    label: Fractional intensity threshold
+    inputBinding: {prefix: -f, position: 7}
+  vert_frac: # bound from -1 to 1
+    type: ['null', double]
+    label: Vertical gradient in fractional intensity
+    inputBinding: {prefix: -g, position: 8}
+  radius: 
+    type: ['null', double]
+    label: Radius of the brain centre in mm
+    inputBinding: {prefix: -r, position: 9}
+  cog:
+    type: ['null', string]  # e.g. "90 110 75"
+    label: Center of gravity vox coordinates
+    inputBinding: {prefix: -c, position: 10}
+  threshold: 
     type: ['null', boolean]
-    label: Generate binary brain mask image (-m)
-    inputBinding:
-      prefix: -m
-      separate: false
-  robust:
+    label: Use thresholding to estimate the brain centre
+    inputBinding: {prefix: -t, position: 11}
+  mesh: 
     type: ['null', boolean]
-    label: Robust brain centre estimation (-R)
-    inputBinding:
-      prefix: -R
-      separate: false
+    label: Generate a mesh of the brain surface
+    inputBinding: {prefix: -e, position: 12}
 
-  # expose more flags here as needed …
+  # MUTUALLY EXCLUSIVE OPTIONAL PARAMETERS
+  # Only one of these can be set at a time
 
-stdout: bet.log
+  robust: 
+    type: ['null', boolean]
+    label: Use robust fitting
+    inputBinding: {prefix: -R, position: 13}
+
+  eye:
+    type: ['null', boolean]
+    label: Use eye mask
+    inputBinding: {prefix: -S, position: 14}
+
+  bias:
+    type: ['null', boolean]
+    label: Use bias field correction
+    inputBinding: {prefix: -B, position: 15}
+
+  fov:
+    type: ['null', boolean]
+    label: Use field of view
+    inputBinding: {prefix: -Z, position: 16}
+
+  fmri: 
+    type: ['null', boolean]
+    label: Use fMRI mode
+    inputBinding: {prefix: -F, position: 17}
+
+  betsurf: 
+    type: ['null', boolean]
+    label: Use BET surface mode
+    inputBinding: {prefix: -A, position: 18}
+
+
 outputs:
-  brain_image:
-    type: File
+  brain_extraction:
+    type: ['null', File]
     outputBinding:
-      glob: $(inputs.output_prefix)_brain.nii.gz
+      glob:
+        - $(inputs.output).nii
+        - $(inputs.output).nii.gz
+
   brain_mask:
     type: ['null', File]
     outputBinding:
-      glob: $(inputs.output_prefix)_brain_mask.nii.gz
-  log:
+      glob:
+        - $(inputs.output)_mask.nii.gz
+        - $(inputs.output)_mask.nii
+
+  brain_skull: 
+    type: ['null', File]
+    outputBinding:
+      glob:
+        - $(inputs.output)_skull.nii.gz
+        - $(inputs.output)_skull.nii
+
+  brain_mesh: 
+    type: ['null', File]
+    outputBinding:
+      glob:
+        - $(inputs.output)_mesh.vtk
+  
+  brain_registration: 
+    type: File[]
+    outputBinding:
+      glob:
+        - $(inputs.output)_inskull_*.*
+        - $(inputs.output)_outskin_*.*
+        - $(inputs.output)_outskull_*.*
+        - $(inputs.output)_skull_mask.*
+
+  log: 
     type: File
     outputBinding:
-      glob: bet.log
+      glob: $(inputs.output).log
