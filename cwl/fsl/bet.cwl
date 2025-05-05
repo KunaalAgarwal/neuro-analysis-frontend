@@ -46,11 +46,12 @@ inputs:
     type: ['null', double]
     label: Fractional intensity threshold
     inputBinding: {prefix: -f, position: 7}
+    default: 0.5
   vert_frac: # bound from -1 to 1
     type: ['null', double]
     label: Vertical gradient in fractional intensity
     inputBinding: {prefix: -g, position: 8}
-  radius: 
+  radius:
     type: ['null', double]
     label: Radius of the brain centre in mm
     inputBinding: {prefix: -r, position: 9}
@@ -58,11 +59,11 @@ inputs:
     type: ['null', string]  # e.g. "90 110 75"
     label: Center of gravity vox coordinates
     inputBinding: {prefix: -c, position: 10}
-  threshold: 
+  threshold:
     type: ['null', boolean]
     label: Use thresholding to estimate the brain centre
     inputBinding: {prefix: -t, position: 11}
-  mesh: 
+  mesh:
     type: ['null', boolean]
     label: Generate a mesh of the brain surface
     inputBinding: {prefix: -e, position: 12}
