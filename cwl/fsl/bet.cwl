@@ -68,38 +68,59 @@ inputs:
     inputBinding: {prefix: -e, position: 12}
 
   # MUTUALLY EXCLUSIVE OPTIONAL PARAMETERS
-  # Only one of these can be set at a time
-
-  robust: 
-    type: ['null', boolean]
-    label: Use robust fitting
-    inputBinding: {prefix: -R, position: 13}
-
-  eye:
-    type: ['null', boolean]
-    label: Use eye mask
-    inputBinding: {prefix: -S, position: 14}
-
-  bias:
-    type: ['null', boolean]
-    label: Use bias field correction
-    inputBinding: {prefix: -B, position: 15}
-
-  fov:
-    type: ['null', boolean]
-    label: Use field of view
-    inputBinding: {prefix: -Z, position: 16}
-
-  fmri: 
-    type: ['null', boolean]
-    label: Use fMRI mode
-    inputBinding: {prefix: -F, position: 17}
-
-  betsurf: 
-    type: ['null', boolean]
-    label: Use BET surface mode
-    inputBinding: {prefix: -A, position: 18}
-
+  # The 'exclusive' field is a workaround for mutually exclusive parameters.
+  exclusive:
+    type:
+      - 'null'
+      - type: record
+        name: robust
+        fields:
+          robust:
+            type: boolean
+            label: Use robust fitting
+            inputBinding: {prefix: -R, position: 13}
+      - type: record
+        name: eye
+        fields:
+          eye:
+            type: boolean
+            label: Use eye mask
+            inputBinding: {prefix: -S, position: 13}
+      - type: record
+        name: bias
+        fields:
+          bias:
+            type: boolean
+            label: Use bias field correction
+            inputBinding: {prefix: -B, position: 13}
+      - type: record
+        name: fov
+        fields:
+          fov:
+            type: boolean
+            label: Use field of view
+            inputBinding: {prefix: -Z, position: 13}
+      - type: record
+        name: fmri
+        fields:
+          fmri:
+            type: boolean
+            label: Use fMRI mode
+            inputBinding: {prefix: -F, position: 13}
+      - type: record
+        name: betsurf
+        fields:
+          betsurf:
+            type: boolean
+            label: Use BET surface mode
+            inputBinding: {prefix: -A, position: 13}
+      - type: record
+        name: betsurfT2
+        fields:
+          betsurfT2:
+            type: File
+            label: Use BET surface mode for T2-weighted images
+            inputBinding: {prefix: -A2, position: 13}
 
 outputs:
   brain_extraction:
