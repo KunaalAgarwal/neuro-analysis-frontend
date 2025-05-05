@@ -46,7 +46,6 @@ inputs:
     type: ['null', double]
     label: Fractional intensity threshold
     inputBinding: {prefix: -f, position: 7}
-    default: 0.5
   vert_frac: # bound from -1 to 1
     type: ['null', double]
     label: Vertical gradient in fractional intensity
