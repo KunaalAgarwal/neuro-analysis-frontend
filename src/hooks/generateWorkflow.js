@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { buildCWLWorkflow } from './buildWorkflow.js';
-import { TOOL_MAP } from '../../cwl/toolMap.js';
+import { TOOL_MAP } from '../../public/cwl/toolMap.js';
 
 export function useGenerateWorkflow() {
     /**

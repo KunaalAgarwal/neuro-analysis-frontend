@@ -1,5 +1,5 @@
 import YAML from 'js-yaml';
-import { TOOL_MAP } from '../../cwl/toolMap.js';
+import { TOOL_MAP } from '../../public/cwl/toolMap.js';
 
 /**
  * Convert the React-Flow graph into a CWL Workflow yaml string.
