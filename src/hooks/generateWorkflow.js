@@ -7,7 +7,7 @@ export function useGenerateWorkflow() {
     /**
      * Builds main.cwl, pulls tool CWL files, zips, and downloads.
      * Works both in `npm run dev` (BASE_URL = "/") and on GitHub Pages
-     * (BASE_URL = "/neuro-analysis-frontend/").
+     * (BASE_URL = "/fMRIbuild/").
      */
     const generateWorkflow = async (getWorkflowData) => {
         if (typeof getWorkflowData !== 'function') {

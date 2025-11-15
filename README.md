@@ -2,15 +2,15 @@
 
 To streamline the process of creating fMRI and other neuro-imaging analysis workflows, we've developed this graphical user interface (GUI). Users can design workflows by selecting common analysis operations from FSL, AFNI, and SPM. Once the workflow is configured, you can directly generate a zip file containing the [Common Workflow Language (CWL)](https://www.commonwl.org/user_guide/introduction/index.html) workflow along with its tool dependencies.
 
-### [Deployment](https://kunaalagarwal.github.io/neuro-analysis-frontend/)
+### [Deployment](https://kunaalagarwal.github.io/fMRIbuild/)
 
 ### Running Locally
 
 Clone the repository, install the dependencies, and start the development server:
 
 ```bash
-git clone https://github.com/KunaalAgarwal/neuro-analysis-frontend.git
-cd neuro-analysis-frontend
+git clone https://github.com/KunaalAgarwal/fMRIbuild.git
+cd fMRIbuild
 npm install
 npm run dev
 ```

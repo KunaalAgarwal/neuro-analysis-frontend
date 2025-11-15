@@ -1,8 +1,8 @@
 {
-  "name": "neuro-analysis-frontend",
+  "name": "fMRIbuild",
   "version": "1.0.0",
   "description": "Front end for the CWL neuro analysis workflow app.",
-  "homepage": "https://kunaalagarwal.github.io/neuro-analysis-frontend",
+  "homepage": "https://kunaalagarwal.github.io/fMRIbuild",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
