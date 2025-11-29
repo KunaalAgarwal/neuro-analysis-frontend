@@ -16,7 +16,7 @@ export function useGenerateWorkflow() {
         }
 
         const graph = getWorkflowData();
-        if (!graph) {
+        if (!graph || !graph.nodes || graph.nodes.length === 0) {
             alert('Empty workflow — nothing to export.');
             return;
         }
@@ -30,17 +30,31 @@ export function useGenerateWorkflow() {
             return;
         }
 
+        // Add shebang to make it executable
+        const shebang = '#!/usr/bin/env cwl-runner\n\n';
+        mainCWL = shebang + mainCWL;
+
         /* ---------- prepare ZIP ---------- */
         const zip = new JSZip();
         zip.file('workflows/main.cwl', mainCWL);
 
-        /* ---------- fetch each unique tool file ---------- */
-        const uniquePaths = [
-            ...new Set(graph.nodes.map(n => TOOL_MAP[n.data.label].cwlPath))
-        ];
-
         // baseURL ends in "/", ensure single slash join
         const base = (import.meta.env.BASE_URL || '/').replace(/\/?$/, '/');
+
+        /* ---------- fetch README ---------- */
+        try {
+            const readmeRes = await fetch(`${base}README.md`);
+            if (readmeRes.ok) {
+                zip.file('README.md', await readmeRes.text());
+            }
+        } catch (err) {
+            console.warn('Could not fetch README.md:', err.message);
+        }
+
+        /* ---------- fetch each unique tool file ---------- */
+        const uniquePaths = [
+            ...new Set(graph.nodes.map(n => TOOL_MAP[n.data.label]?.cwlPath).filter(Boolean))
+        ];
 
         try {
             for (const p of uniquePaths) {
