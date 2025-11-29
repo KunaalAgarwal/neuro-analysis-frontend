@@ -89,47 +89,20 @@ export const TOOL_MAP = {
                 label: 'Generate a mesh of the brain surface',
                 flag: '-e'
             },
-            robust: {
-                type: 'boolean',
-                label: 'Use robust fitting',
-                flag: '-R',
-                exclusive: 'bet_mode'
-            },
-            eye: {
-                type: 'boolean',
-                label: 'Use eye mask',
-                flag: '-S',
-                exclusive: 'bet_mode'
-            },
-            bias: {
-                type: 'boolean',
-                label: 'Use bias field correction',
-                flag: '-B',
-                exclusive: 'bet_mode'
-            },
-            fov: {
-                type: 'boolean',
-                label: 'Use field of view',
-                flag: '-Z',
-                exclusive: 'bet_mode'
-            },
-            fmri: {
-                type: 'boolean',
-                label: 'Use fMRI mode',
-                flag: '-F',
-                exclusive: 'bet_mode'
-            },
-            betsurf: {
-                type: 'boolean',
-                label: 'Use BET surface mode',
-                flag: '-A',
-                exclusive: 'bet_mode'
-            },
-            betsurfT2: {
-                type: 'File',
-                label: 'Use BET surface mode for T2-weighted images',
-                flag: '-A2',
-                exclusive: 'bet_mode'
+            // Mutually exclusive options - wrapped in single 'exclusive' input in CWL
+            // This is a record type where only one variant can be used
+            exclusive: {
+                type: 'record',
+                label: 'Mutually exclusive BET modes (choose one)',
+                variants: {
+                    robust: { type: 'boolean', label: 'Use robust fitting', flag: '-R' },
+                    eye: { type: 'boolean', label: 'Use eye mask', flag: '-S' },
+                    bias: { type: 'boolean', label: 'Use bias field correction', flag: '-B' },
+                    fov: { type: 'boolean', label: 'Use field of view', flag: '-Z' },
+                    fmri: { type: 'boolean', label: 'Use fMRI mode', flag: '-F' },
+                    betsurf: { type: 'boolean', label: 'Use BET surface mode', flag: '-A' },
+                    betsurfT2: { type: 'File', label: 'Use BET surface mode for T2-weighted images', flag: '-A2' }
+                }
             }
         },
 
@@ -274,16 +247,14 @@ export const TOOL_MAP = {
                 label: 'Output individual probability maps',
                 flag: '-p'
             },
-            initialize_priors: {
-                type: 'File',
-                label: 'FLIRT transformation file for prior initialization',
-                flag: '-a'
-            },
-            use_priors: {
-                type: 'boolean',
-                label: 'Use priors',
-                flag: '-P',
-                dependsOn: 'initialize_priors'
+            // Dependent parameters (priors) - these work together
+            priors: {
+                type: 'record',
+                label: 'Prior initialization settings',
+                variants: {
+                    initialize_priors: { type: 'File', label: 'FLIRT transformation file for prior initialization', flag: '-a' },
+                    use_priors: { type: 'boolean', label: 'Use priors', flag: '-P' }
+                }
             }
         },
 

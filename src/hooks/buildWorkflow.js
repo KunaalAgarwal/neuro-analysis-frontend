@@ -4,6 +4,10 @@ import { TOOL_MAP } from '../../public/cwl/toolMap.js';
 /**
  * Convert the React-Flow graph into a CWL Workflow YAML string.
  * Uses static TOOL_MAP metadata to wire inputs/outputs correctly.
+ *
+ * - Exposes all required inputs as workflow inputs
+ * - Exposes all optional inputs as nullable workflow inputs
+ * - Exposes all outputs from terminal nodes
  */
 export function buildCWLWorkflow(graph) {
     const { nodes, edges } = graph;
@@ -31,6 +35,33 @@ export function buildCWLWorkflow(graph) {
         throw new Error('Workflow graph has cycles.');
     }
 
+    /* ---------- generate readable step IDs ---------- */
+    // Count occurrences of each tool to handle duplicates
+    const toolCounts = {};
+    const nodeIdToStepId = {};
+
+    order.forEach((nodeId) => {
+        const node = nodeById(nodeId);
+        const tool = TOOL_MAP[node.data.label];
+        const toolId = tool.id;
+
+        // Track how many times we've seen this tool
+        if (!(toolId in toolCounts)) {
+            toolCounts[toolId] = 0;
+        }
+        toolCounts[toolId]++;
+
+        // Store mapping from node ID to step ID
+        nodeIdToStepId[nodeId] = { toolId, count: toolCounts[toolId] };
+    });
+
+    // Generate final step IDs (only add number suffix if duplicates exist)
+    const getStepId = (nodeId) => {
+        const { toolId, count } = nodeIdToStepId[nodeId];
+        const totalCount = toolCounts[toolId];
+        return totalCount > 1 ? `${toolId}_${count}` : toolId;
+    };
+
     /* ---------- build CWL skeleton ---------- */
     const wf = {
         cwlVersion: 'v1.2',
@@ -45,6 +76,34 @@ export function buildCWLWorkflow(graph) {
         nodes.filter(n => inEdgesOf(n.id).length === 0).map(n => n.id)
     );
 
+    /* ---------- helper: convert type string to CWL type ---------- */
+    const toCWLType = (typeStr, makeNullable = false) => {
+        if (!typeStr) return makeNullable ? ['null', 'File'] : 'File';
+
+        // Skip record types - handled separately
+        if (typeStr === 'record') return null;
+
+        // Handle array types like 'File[]'
+        if (typeStr.endsWith('[]')) {
+            const itemType = typeStr.slice(0, -2);
+            const arrayType = { type: 'array', items: itemType };
+            return makeNullable ? ['null', arrayType] : arrayType;
+        }
+
+        // Handle nullable types like 'File?'
+        if (typeStr.endsWith('?')) {
+            return ['null', typeStr.slice(0, -1)];
+        }
+
+        // Plain type
+        return makeNullable ? ['null', typeStr] : typeStr;
+    };
+
+    /* ---------- helper: generate workflow input name ---------- */
+    const makeWfInputName = (stepId, inputName, isSingleNode) => {
+        return isSingleNode ? inputName : `${stepId}_${inputName}`;
+    };
+
     /* ---------- walk nodes in topo order ---------- */
     order.forEach((nodeId) => {
         const node = nodeById(nodeId);
@@ -55,14 +114,16 @@ export function buildCWLWorkflow(graph) {
             throw new Error(`No tool mapping for label "${label}"`);
         }
 
-        const stepId = `step_${nodeId}`;
+        const stepId = getStepId(nodeId);
         const incomingEdges = inEdgesOf(nodeId);
+        const isSingleNode = nodes.length === 1;
 
         // Step skeleton with correct relative path
+        // Declare ALL outputs so they can be referenced
         const step = {
             run: `../${tool.cwlPath}`,
             in: {},
-            out: tool.primaryOutputs
+            out: Object.keys(tool.outputs)
         };
 
         /* ---------- handle required inputs ---------- */
@@ -70,55 +131,68 @@ export function buildCWLWorkflow(graph) {
             const { type, passthrough } = inputDef;
 
             if (passthrough) {
-                // This input receives upstream output or becomes workflow input
                 if (incomingEdges.length > 0) {
                     // Wire from upstream node's primary output
                     const srcEdge = incomingEdges[0];
                     const srcNode = nodeById(srcEdge.source);
                     const srcTool = TOOL_MAP[srcNode.data.label];
-                    const srcStepId = `step_${srcEdge.source}`;
+                    const srcStepId = getStepId(srcEdge.source);
                     step.in[inputName] = `${srcStepId}/${srcTool.primaryOutputs[0]}`;
                 } else {
                     // Source node - expose as workflow input
                     const wfInputName = sourceNodeIds.size === 1
                         ? 'input_file'
                         : `${stepId}_input_file`;
-                    wf.inputs[wfInputName] = { type };
+                    wf.inputs[wfInputName] = { type: toCWLType(type) };
                     step.in[inputName] = wfInputName;
                 }
             } else {
                 // Non-passthrough required input - expose as workflow input
-                const wfInputName = nodes.length === 1
-                    ? inputName
-                    : `${stepId}_${inputName}`;
-                wf.inputs[wfInputName] = { type };
+                const wfInputName = makeWfInputName(stepId, inputName, isSingleNode);
+                wf.inputs[wfInputName] = { type: toCWLType(type) };
                 step.in[inputName] = wfInputName;
             }
         });
 
+        /* ---------- handle optional inputs ---------- */
+        if (tool.optionalInputs) {
+            Object.entries(tool.optionalInputs).forEach(([inputName, inputDef]) => {
+                const { type } = inputDef;
+
+                // Skip record types - these are complex types handled by CWL directly
+                if (type === 'record') {
+                    const wfInputName = makeWfInputName(stepId, inputName, isSingleNode);
+                    wf.inputs[wfInputName] = { type: ['null', 'Any'] };
+                    step.in[inputName] = wfInputName;
+                    return;
+                }
+
+                const wfInputName = makeWfInputName(stepId, inputName, isSingleNode);
+
+                // Make optional inputs nullable
+                wf.inputs[wfInputName] = { type: toCWLType(type, true) };
+                step.in[inputName] = wfInputName;
+            });
+        }
+
         wf.steps[stepId] = step;
     });
 
-    /* ---------- declare workflow outputs from terminal nodes ---------- */
+    /* ---------- declare ALL outputs from terminal nodes ---------- */
     const terminalNodes = nodes.filter(n => outEdgesOf(n.id).length === 0);
 
     terminalNodes.forEach(node => {
         const tool = TOOL_MAP[node.data.label];
-        const stepId = `step_${node.id}`;
+        const stepId = getStepId(node.id);
+        const isSingleTerminal = terminalNodes.length === 1;
 
-        tool.primaryOutputs.forEach(outputName => {
-            const outputDef = tool.outputs[outputName];
-            const wfOutputName = terminalNodes.length === 1
+        // Expose ALL outputs from terminal nodes
+        Object.entries(tool.outputs).forEach(([outputName, outputDef]) => {
+            const wfOutputName = isSingleTerminal
                 ? outputName
                 : `${stepId}_${outputName}`;
 
-            // Get type from outputs definition, default to File
-            let outputType = outputDef?.type || 'File';
-
-            // Convert 'File?' shorthand to CWL array syntax ['null', 'File']
-            if (typeof outputType === 'string' && outputType.endsWith('?')) {
-                outputType = ['null', outputType.slice(0, -1)];
-            }
+            const outputType = toCWLType(outputDef.type);
 
             wf.outputs[wfOutputName] = {
                 type: outputType,
@@ -127,5 +201,5 @@ export function buildCWLWorkflow(graph) {
         });
     });
 
-    return YAML.dump(wf);
+    return YAML.dump(wf, { noRefs: true });
 }
